@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SHAPESHIFTER — Draw to Match</title>
+<title>SHAPESHIFTER — Trace the World's Roundels</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bungee&family=JetBrains+Mono:wght@400;700&family=Fraunces:opsz,wght@9..144,300;9..144,600;9..144,900&display=swap" rel="stylesheet">
@@ -38,7 +38,6 @@
     background-size: auto, auto, 32px 32px, 32px 32px;
     background-position: 0 0, 0 0, -1px -1px, -1px -1px;
   }
-  /* Grainy noise overlay */
   body::before {
     content: '';
     position: fixed; inset: 0;
@@ -49,346 +48,184 @@
     mix-blend-mode: overlay;
   }
 
-  .app {
-    position: relative;
-    z-index: 2;
-    max-width: 1280px;
-    margin: 0 auto;
-    padding: 28px 32px 60px;
-  }
+  .app { position: relative; z-index: 2; max-width: 1280px; margin: 0 auto; padding: 28px 32px 60px; }
 
-  /* HEADER */
   header {
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    padding-bottom: 18px;
-    margin-bottom: 28px;
+    display: flex; align-items: end; justify-content: space-between;
+    border-bottom: 1px solid var(--border); padding-bottom: 18px; margin-bottom: 28px;
   }
   .logo {
     font-family: 'Bungee', sans-serif;
     font-size: clamp(28px, 5vw, 52px);
-    letter-spacing: -0.02em;
-    line-height: 0.95;
-    color: var(--ink);
+    letter-spacing: -0.02em; line-height: 0.95; color: var(--ink);
   }
   .logo .dot { color: var(--accent); }
   .tag {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    max-width: 240px;
-    text-align: right;
-    line-height: 1.5;
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim);
+    text-transform: uppercase; letter-spacing: 0.15em; max-width: 260px;
+    text-align: right; line-height: 1.5;
   }
-  .tag .blink {
-    display: inline-block;
-    width: 8px; height: 8px;
-    background: var(--good);
-    border-radius: 50%;
-    margin-right: 6px;
-    animation: blink 1.4s infinite;
-    vertical-align: 1px;
-  }
-  @keyframes blink { 0%, 60% { opacity: 1; } 80%, 100% { opacity: 0.3; } }
 
-  /* MAIN GRID */
-  .main {
-    display: grid;
-    grid-template-columns: 1fr 320px;
-    gap: 28px;
-  }
-  @media (max-width: 900px) {
-    .main { grid-template-columns: 1fr; }
-  }
+  .main { display: grid; grid-template-columns: 1fr 320px; gap: 28px; }
+  @media (max-width: 900px) { .main { grid-template-columns: 1fr; } }
 
   .panel {
-    background: var(--bg-elev);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 24px;
-    position: relative;
+    background: var(--bg-elev); border: 1px solid var(--border);
+    border-radius: 4px; padding: 24px; position: relative;
   }
   .panel-label {
-    position: absolute;
-    top: -10px; left: 18px;
-    background: var(--bg-elev);
-    padding: 0 10px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    color: var(--accent);
-    text-transform: uppercase;
+    position: absolute; top: -10px; left: 18px; background: var(--bg-elev);
+    padding: 0 10px; font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 0.2em; color: var(--accent); text-transform: uppercase;
   }
 
-  /* SHAPE PICKER */
-  .shapes {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(90px, 1fr));
-    gap: 10px;
-    margin-bottom: 20px;
+  .era-tabs {
+    display: flex; gap: 6px; margin-bottom: 16px;
   }
-  .shape-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    padding: 14px 8px 10px;
-    color: var(--ink);
-    cursor: pointer;
-    transition: all 0.18s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+  .era-tab {
+    flex: 1; background: transparent; border: 1px solid var(--border);
+    color: var(--ink-dim); font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase;
+    padding: 10px; cursor: pointer; border-radius: 2px; transition: all 0.15s ease;
   }
-  .shape-btn svg { width: 32px; height: 32px; }
-  .shape-btn:hover {
-    border-color: var(--hot);
-    transform: translateY(-2px);
+  .era-tab:hover { border-color: var(--hot); color: var(--ink); }
+  .era-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .roundels {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(78px, 1fr));
+    gap: 10px; margin-bottom: 20px;
   }
-  .shape-btn.active {
-    background: var(--hot);
-    color: var(--bg);
-    border-color: var(--hot);
+  .roundel-btn {
+    background: transparent; border: 1px solid var(--border); border-radius: 2px;
+    padding: 12px 6px 8px; color: var(--ink); cursor: pointer;
+    transition: all 0.18s ease; display: flex; flex-direction: column;
+    align-items: center; gap: 6px; font-family: 'JetBrains Mono', monospace;
+    font-size: 9px; letter-spacing: 0.06em; text-transform: uppercase; text-align: center;
   }
-  .shape-btn.active svg path,
-  .shape-btn.active svg circle,
-  .shape-btn.active svg polygon,
-  .shape-btn.active svg line { stroke: var(--bg); }
+  .roundel-btn svg { width: 38px; height: 38px; }
+  .roundel-btn:hover { border-color: var(--hot); transform: translateY(-2px); }
+  .roundel-btn.active { background: rgba(255,225,77,0.12); border-color: var(--hot); }
+  .roundel-btn .flag { font-size: 14px; line-height: 1; }
+  .roundel-btn .diff { font-size: 8px; color: var(--ink-dim); letter-spacing: 0.1em; }
+  .roundel-btn.active .diff { color: var(--hot); }
 
-  /* CANVAS AREA */
   .canvas-wrap {
-    position: relative;
-    aspect-ratio: 1 / 1;
-    background:
-      radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02), transparent 60%),
-      var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    touch-action: none;
-    container-type: inline-size;
+    position: relative; aspect-ratio: 1 / 1;
+    background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.02), transparent 60%), var(--bg);
+    border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
+    touch-action: none; container-type: inline-size;
   }
-  /* Crosshair marks in corners */
-  .canvas-wrap::before,
-  .canvas-wrap::after {
-    content: '';
-    position: absolute;
-    width: 14px; height: 14px;
-    border: 1px solid var(--ink-dim);
-    opacity: 0.4;
+  .canvas-wrap::before, .canvas-wrap::after {
+    content: ''; position: absolute; width: 14px; height: 14px;
+    border: 1px solid var(--ink-dim); opacity: 0.4;
   }
   .canvas-wrap::before { top: 8px; left: 8px; border-right: none; border-bottom: none; }
   .canvas-wrap::after { bottom: 8px; right: 8px; border-left: none; border-top: none; }
 
-  #targetCanvas, #drawCanvas, #fxCanvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-  }
+  #targetCanvas, #drawCanvas, #fxCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
   #targetCanvas { pointer-events: none; }
-  #fxCanvas { pointer-events: none; }
+  #fxCanvas { pointer-events: none; z-index: 3; }
   #drawCanvas { cursor: crosshair; z-index: 2; }
-  #fxCanvas { z-index: 3; }
 
   .canvas-hint {
-    position: absolute;
-    bottom: 14px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--ink-dim);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    pointer-events: none;
-    opacity: 0.7;
+    position: absolute; bottom: 14px; left: 50%; transform: translateX(-50%);
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-dim);
+    letter-spacing: 0.2em; text-transform: uppercase; pointer-events: none;
+    opacity: 0.85; text-align: center; width: 90%;
   }
 
-  /* CONTROLS */
-  .controls {
-    display: flex;
-    gap: 10px;
-    margin-top: 16px;
+  .ring-tracker { display: flex; align-items: center; gap: 8px; margin: 16px 0 0; flex-wrap: wrap; }
+  .ring-chip {
+    display: flex; align-items: center; gap: 6px; padding: 6px 10px;
+    border: 1px solid var(--border); border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--ink-dim); transition: all 0.2s;
   }
+  .ring-chip .swatch { width: 12px; height: 12px; border-radius: 3px; border: 1px solid rgba(255,255,255,0.3); }
+  .ring-chip.current { border-color: var(--hot); color: var(--ink); box-shadow: 0 0 0 1px var(--hot); }
+  .ring-chip.done { color: var(--good); border-color: rgba(124,255,107,0.4); }
+  .ring-chip.done::after { content: '✓'; color: var(--good); }
+
+  .controls { display: flex; gap: 10px; margin-top: 16px; }
   .btn {
-    flex: 1;
-    background: transparent;
-    border: 1px solid var(--ink);
-    color: var(--ink);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    padding: 14px 18px;
-    cursor: pointer;
-    transition: all 0.15s ease;
-    border-radius: 2px;
+    flex: 1; background: transparent; border: 1px solid var(--ink); color: var(--ink);
+    font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.15em; text-transform: uppercase; padding: 14px 18px;
+    cursor: pointer; transition: all 0.15s ease; border-radius: 2px;
   }
-  .btn:hover {
-    background: var(--ink);
-    color: var(--bg);
-  }
-  .btn.primary {
-    background: var(--accent);
-    color: var(--bg);
-    border-color: var(--accent);
-  }
-  .btn.primary:hover {
-    background: var(--hot);
-    border-color: var(--hot);
-  }
-  .btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+  .btn:hover { background: var(--ink); color: var(--bg); }
+  .btn.primary { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+  .btn.primary:hover { background: var(--hot); border-color: var(--hot); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn:disabled:hover { background: transparent; color: var(--ink); }
 
-  /* SIDEBAR */
-  .sidebar {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
+  .sidebar { display: flex; flex-direction: column; gap: 20px; }
 
-  /* SCORE DISPLAY */
-  .score-display {
-    text-align: center;
-    padding: 8px 0 4px;
-  }
+  .score-display { text-align: center; padding: 8px 0 4px; }
   .score-label {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    letter-spacing: 0.3em;
-    color: var(--ink-dim);
-    text-transform: uppercase;
-    margin-bottom: 8px;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.3em;
+    color: var(--ink-dim); text-transform: uppercase; margin-bottom: 8px;
   }
   .score-value {
-    font-family: 'Bungee', sans-serif;
-    font-size: 88px;
-    line-height: 0.9;
+    font-family: 'Bungee', sans-serif; font-size: 88px; line-height: 0.9;
     background: linear-gradient(180deg, var(--hot), var(--accent));
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .score-value.idle {
-    background: none;
-    -webkit-text-fill-color: var(--ink-dim);
-    opacity: 0.3;
-  }
-  .score-suffix {
-    font-family: 'Bungee', sans-serif;
-    font-size: 32px;
-    color: var(--ink-dim);
-  }
+  .score-value.idle { background: none; -webkit-text-fill-color: var(--ink-dim); opacity: 0.3; }
+  .score-suffix { font-family: 'Bungee', sans-serif; font-size: 32px; color: var(--ink-dim); }
   .score-verdict {
-    font-family: 'Fraunces', serif;
-    font-style: italic;
-    font-weight: 600;
-    font-size: 18px;
-    margin-top: 8px;
-    min-height: 24px;
-    color: var(--ink);
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 600; font-size: 18px;
+    margin-top: 8px; min-height: 24px; color: var(--ink);
   }
+  .fact {
+    font-family: 'Fraunces', serif; font-size: 13px; line-height: 1.5; color: var(--ink-dim);
+    margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border); font-style: italic;
+  }
+  .fact strong { color: var(--ink); font-style: normal; }
 
-  /* BEST SCORES */
-  .records {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
+  .records { display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto; }
+  .records::-webkit-scrollbar { width: 6px; }
+  .records::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
   .record {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 2px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 12px;
-    transition: all 0.2s;
+    display: flex; align-items: center; justify-content: space-between; padding: 10px 12px;
+    border: 1px solid var(--border); border-radius: 2px;
+    font-family: 'JetBrains Mono', monospace; font-size: 12px; transition: all 0.2s;
   }
   .record.has-score { border-color: rgba(255,225,77,0.3); background: rgba(255,225,77,0.04); }
-  .record.just-updated {
-    animation: flashGold 0.6s ease;
-  }
-  @keyframes flashGold {
-    0% { background: rgba(255,225,77,0.4); }
-    100% { background: rgba(255,225,77,0.04); }
-  }
+  .record.just-updated { animation: flashGold 0.6s ease; }
+  @keyframes flashGold { 0% { background: rgba(255,225,77,0.4); } 100% { background: rgba(255,225,77,0.04); } }
   .record-name {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--ink-dim);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    font-size: 10px;
+    display: flex; align-items: center; gap: 8px; color: var(--ink-dim);
+    text-transform: uppercase; letter-spacing: 0.06em; font-size: 10px;
   }
-  .record-name svg { width: 16px; height: 16px; }
-  .record-score {
-    font-weight: 700;
-    color: var(--hot);
-    font-size: 14px;
-  }
+  .record-name .flag { font-size: 14px; }
+  .record-score { font-weight: 700; color: var(--hot); font-size: 14px; }
   .record.has-score .record-name { color: var(--ink); }
+  .records-era {
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.2em;
+    text-transform: uppercase; color: var(--accent); margin: 12px 0 4px; padding-left: 2px;
+  }
+  .records-era:first-child { margin-top: 0; }
 
   .reset-link {
-    background: none;
-    border: none;
-    color: var(--ink-dim);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    cursor: pointer;
-    padding: 8px;
-    text-align: center;
-    text-decoration: underline;
-    text-underline-offset: 3px;
+    background: none; border: none; color: var(--ink-dim);
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase;
+    letter-spacing: 0.15em; cursor: pointer; padding: 12px 8px 0; text-align: center;
+    text-decoration: underline; text-underline-offset: 3px;
   }
   .reset-link:hover { color: var(--accent); }
 
-  /* MODAL VERDICT */
   .verdict-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 10;
-  }
-  .verdict-overlay.show {
-    pointer-events: auto;
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    pointer-events: none; z-index: 10;
   }
   .verdict-text {
-    font-family: 'Bungee', sans-serif;
-    font-size: clamp(36px, 9cqw, 88px);
-    line-height: 0.9;
-    text-align: center;
-    opacity: 0;
-    transform: scale(0.5) rotate(-8deg);
-    text-shadow: 0 0 40px currentColor;
-    letter-spacing: -0.02em;
-    padding: 0 16px;
-    max-width: 100%;
-    word-break: break-word;
+    font-family: 'Bungee', sans-serif; font-size: clamp(36px, 9cqw, 88px); line-height: 0.9;
+    text-align: center; opacity: 0; transform: scale(0.5) rotate(-8deg);
+    text-shadow: 0 0 40px currentColor; letter-spacing: -0.02em; padding: 0 16px;
+    max-width: 100%; word-break: break-word;
   }
-  .verdict-overlay.show .verdict-text {
-    animation: verdictPop 1.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-  }
+  .verdict-overlay.show .verdict-text { animation: verdictPop 1.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
   @keyframes verdictPop {
     0% { opacity: 0; transform: scale(0.3) rotate(-15deg); }
     20% { opacity: 1; transform: scale(1.1) rotate(2deg); }
@@ -396,43 +233,20 @@
     100% { opacity: 1; transform: scale(1) rotate(0deg); }
   }
 
-  /* Pulse ring for canvas on great score */
-  .pulse-ring {
-    position: absolute;
-    inset: 0;
-    border: 3px solid var(--good);
-    pointer-events: none;
-    opacity: 0;
-  }
-  .pulse-ring.fire {
-    animation: pulseRing 1s ease-out;
-  }
-  @keyframes pulseRing {
-    0% { opacity: 1; transform: scale(0.95); }
-    100% { opacity: 0; transform: scale(1.05); }
-  }
+  .pulse-ring { position: absolute; inset: 0; border: 3px solid var(--good); pointer-events: none; opacity: 0; }
+  .pulse-ring.fire { animation: pulseRing 1s ease-out; }
+  @keyframes pulseRing { 0% { opacity: 1; transform: scale(0.95); } 100% { opacity: 0; transform: scale(1.05); } }
 
-  /* Status bar */
   .statusbar {
-    display: flex;
-    gap: 20px;
-    margin-top: 12px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--ink-dim);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+    display: flex; gap: 18px; margin-top: 14px; flex-wrap: wrap;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--ink-dim);
+    letter-spacing: 0.12em; text-transform: uppercase;
   }
   .statusbar span strong { color: var(--ink); }
 
   footer {
-    text-align: center;
-    margin-top: 40px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 10px;
-    color: var(--ink-dim);
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    text-align: center; margin-top: 40px; font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; color: var(--ink-dim); letter-spacing: 0.2em; text-transform: uppercase;
   }
 </style>
 </head>
@@ -440,15 +254,17 @@
 <div class="app">
   <header>
     <div class="logo">SHAPE<span class="dot">·</span>SHIFTER</div>
-    <div class="tag">Your hand vs. geometry.</div>
+    <div class="tag">Trace the insignia of the world's air forces.</div>
   </header>
 
   <div class="main">
-    <!-- LEFT: CANVAS PANEL -->
     <div class="panel">
       <span class="panel-label">// the arena</span>
-
-      <div class="shapes" id="shapeButtons"></div>
+      <div class="era-tabs" id="eraTabs">
+        <button class="era-tab active" data-era="wwi">WWI</button>
+        <button class="era-tab" data-era="modern">Modern</button>
+      </div>
+      <div class="roundels" id="roundelButtons"></div>
 
       <div class="canvas-wrap" id="canvasWrap">
         <canvas id="targetCanvas"></canvas>
@@ -458,228 +274,354 @@
         <div class="verdict-overlay" id="verdictOverlay">
           <div class="verdict-text" id="verdictText"></div>
         </div>
-        <div class="canvas-hint" id="canvasHint">Click & drag to draw</div>
+        <div class="canvas-hint" id="canvasHint">Trace each part of the insignia</div>
       </div>
 
+      <div class="ring-tracker" id="ringTracker"></div>
+
       <div class="controls">
+        <button class="btn" id="undoBtn">Undo</button>
         <button class="btn" id="clearBtn">Clear</button>
-        <button class="btn primary" id="scoreBtn">Score My Drawing</button>
+        <button class="btn primary" id="scoreBtn">Score</button>
       </div>
 
       <div class="statusbar">
-        <span>Mode <strong id="modeLabel">—</strong></span>
-        <span>Strokes <strong id="strokeCount">0</strong></span>
+        <span>Insignia <strong id="modeLabel">—</strong></span>
+        <span>Part <strong id="ringLabel">1 / 1</strong></span>
         <span>Attempts <strong id="attemptCount">0</strong></span>
       </div>
     </div>
 
-    <!-- RIGHT: SIDEBAR -->
     <aside class="sidebar">
       <div class="panel">
         <span class="panel-label">// current run</span>
         <div class="score-display">
           <div class="score-label">Accuracy</div>
           <div><span class="score-value idle" id="scoreValue">--</span><span class="score-suffix">%</span></div>
-          <div class="score-verdict" id="scoreVerdict">awaiting first attempt</div>
+          <div class="score-verdict" id="scoreVerdict">pick an insignia to begin</div>
         </div>
+        <div class="fact" id="factBox"></div>
       </div>
 
       <div class="panel">
-        <span class="panel-label">// hall of fame</span>
+        <span class="panel-label">// personal bests</span>
         <div class="records" id="recordsList"></div>
         <button class="reset-link" id="resetBtn">↺ Reset all records</button>
       </div>
     </aside>
   </div>
 
-  <footer>Drag · Release · Be judged</footer>
+  <footer>Roundels are flags for military airplanes</footer>
 </div>
 
 <script>
 // ============================================================
-// SHAPE DEFINITIONS
-// Each shape provides a function that returns an ordered array
-// of points (the "ideal" path) normalized in canvas coords.
+// GEOMETRY HELPERS
+// Each roundel is a list of PARTS you trace in order.
+// A part has: { label, color, type, ...params } and a
+// generate(cx,cy,R) -> ordered [x,y] points (the ideal path).
+// type drives both the scorer and the ghost rendering.
+// types: 'circle' | 'polyline' (closed shapes too) 
 // ============================================================
-const SHAPES = {
-  circle: {
-    name: 'Circle',
-    icon: `<svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="11" stroke="currentColor" stroke-width="2"/></svg>`,
-    closed: true,
-    generate: (w, h) => {
-      const cx = w/2, cy = h/2, r = Math.min(w,h)*0.35;
-      const pts = [];
-      for (let i = 0; i <= 120; i++) {
-        const a = (i/120) * Math.PI * 2 - Math.PI/2;
-        pts.push([cx + Math.cos(a)*r, cy + Math.sin(a)*r]);
-      }
-      return pts;
-    }
-  },
-  square: {
-    name: 'Square',
-    icon: `<svg viewBox="0 0 32 32" fill="none"><rect x="6" y="6" width="20" height="20" stroke="currentColor" stroke-width="2"/></svg>`,
-    closed: true,
-    generate: (w, h) => {
-      const s = Math.min(w,h)*0.6;
-      const x = (w-s)/2, y = (h-s)/2;
-      const pts = [];
-      const corners = [[x,y],[x+s,y],[x+s,y+s],[x,y+s],[x,y]];
-      for (let i = 0; i < corners.length-1; i++) {
-        for (let t = 0; t < 30; t++) {
-          const u = t/30;
-          pts.push([corners[i][0]*(1-u)+corners[i+1][0]*u, corners[i][1]*(1-u)+corners[i+1][1]*u]);
-        }
-      }
-      pts.push(corners[corners.length-1]);
-      return pts;
-    }
-  },
-  triangle: {
-    name: 'Triangle',
-    icon: `<svg viewBox="0 0 32 32" fill="none"><polygon points="16,5 27,26 5,26" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>`,
-    closed: true,
-    generate: (w, h) => {
-      const r = Math.min(w,h)*0.4;
-      const cx = w/2, cy = h/2 + r*0.15;
-      const a1 = [cx, cy - r];
-      const a2 = [cx + r*Math.cos(Math.PI/6), cy + r*Math.sin(Math.PI/6)];
-      const a3 = [cx - r*Math.cos(Math.PI/6), cy + r*Math.sin(Math.PI/6)];
-      const pts = [];
-      const corners = [a1, a2, a3, a1];
-      for (let i = 0; i < corners.length-1; i++) {
-        for (let t = 0; t < 40; t++) {
-          const u = t/40;
-          pts.push([corners[i][0]*(1-u)+corners[i+1][0]*u, corners[i][1]*(1-u)+corners[i+1][1]*u]);
-        }
-      }
-      pts.push(corners[corners.length-1]);
-      return pts;
-    }
-  },
-  star: {
-    name: 'Star',
-    icon: `<svg viewBox="0 0 32 32" fill="none"><polygon points="16,4 19.5,12.5 28.5,13 21.5,18.5 24,27 16,22 8,27 10.5,18.5 3.5,13 12.5,12.5" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>`,
-    closed: true,
-    generate: (w, h) => {
-      const cx = w/2, cy = h/2;
-      const R = Math.min(w,h)*0.4, r = R*0.4;
-      const pts = [];
-      const corners = [];
-      for (let i = 0; i < 10; i++) {
-        const a = (i/10) * Math.PI * 2 - Math.PI/2;
-        const rad = i % 2 === 0 ? R : r;
-        corners.push([cx + Math.cos(a)*rad, cy + Math.sin(a)*rad]);
-      }
-      corners.push(corners[0]);
-      for (let i = 0; i < corners.length-1; i++) {
-        for (let t = 0; t < 20; t++) {
-          const u = t/20;
-          pts.push([corners[i][0]*(1-u)+corners[i+1][0]*u, corners[i][1]*(1-u)+corners[i+1][1]*u]);
-        }
-      }
-      pts.push(corners[corners.length-1]);
-      return pts;
-    }
-  },
-  heart: {
-    name: 'Heart',
-    icon: `<svg viewBox="0 0 32 32" fill="none"><path d="M16 27 C 4 19, 4 10, 10 8 C 13 7, 16 9, 16 12 C 16 9, 19 7, 22 8 C 28 10, 28 19, 16 27 Z" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>`,
-    closed: true,
-    generate: (w, h) => {
-      const cx = w/2, cy = h/2;
-      const scale = Math.min(w,h)*0.018;
-      const pts = [];
-      for (let i = 0; i <= 200; i++) {
-        const t = (i/200) * Math.PI * 2 + Math.PI/2;
-        const x = 16 * Math.pow(Math.sin(t), 3);
-        const y = -(13 * Math.cos(t) - 5 * Math.cos(2*t) - 2 * Math.cos(3*t) - Math.cos(4*t));
-        pts.push([cx + x*scale, cy + y*scale]);
-      }
-      return pts;
-    }
-  },
-  spiral: {
-    name: 'Spiral',
-    icon: `<svg viewBox="0 0 32 32" fill="none"><path d="M16 16 m-1 0 a1 1 0 1 1 2 0 a3 3 0 1 1 -4 0 a5 5 0 1 1 8 0 a7 7 0 1 1 -10 0 a9 9 0 1 1 12 0" stroke="currentColor" stroke-width="2" fill="none"/></svg>`,
-    closed: false,
-    generate: (w, h) => {
-      const cx = w/2, cy = h/2;
-      const maxR = Math.min(w,h)*0.4;
-      const pts = [];
-      const turns = 3;
-      const steps = 200;
-      for (let i = 0; i <= steps; i++) {
-        const t = i/steps;
-        const a = t * Math.PI * 2 * turns;
-        const r = t * maxR;
-        pts.push([cx + Math.cos(a)*r, cy + Math.sin(a)*r]);
-      }
-      return pts;
-    }
-  },
-  infinity: {
-    name: 'Infinity',
-    icon: `<svg viewBox="0 0 32 32" fill="none"><path d="M8 16 C 8 11, 12 11, 16 16 C 20 21, 24 21, 24 16 C 24 11, 20 11, 16 16 C 12 21, 8 21, 8 16 Z" stroke="currentColor" stroke-width="2" fill="none"/></svg>`,
-    closed: true,
-    generate: (w, h) => {
-      const cx = w/2, cy = h/2;
-      const a = Math.min(w,h)*0.35;
-      const pts = [];
-      for (let i = 0; i <= 200; i++) {
-        const t = (i/200) * Math.PI * 2;
-        const x = a * Math.cos(t) / (1 + Math.sin(t)**2);
-        const y = a * Math.sin(t) * Math.cos(t) / (1 + Math.sin(t)**2);
-        pts.push([cx + x, cy + y]);
-      }
-      return pts;
-    }
-  },
-  zigzag: {
-    name: 'Zigzag',
-    icon: `<svg viewBox="0 0 32 32" fill="none"><polyline points="4,10 10,22 16,10 22,22 28,10" stroke="currentColor" stroke-width="2" fill="none" stroke-linejoin="round"/></svg>`,
-    closed: false,
-    generate: (w, h) => {
-      const margin = Math.min(w,h)*0.15;
-      const pts = [];
-      const segments = 4;
-      const segW = (w - margin*2) / segments;
-      const yTop = margin + (h - margin*2)*0.15;
-      const yBot = h - margin - (h - margin*2)*0.15;
-      const corners = [];
-      for (let i = 0; i <= segments; i++) {
-        corners.push([margin + i*segW, i % 2 === 0 ? yTop : yBot]);
-      }
-      for (let i = 0; i < corners.length-1; i++) {
-        for (let t = 0; t < 40; t++) {
-          const u = t/40;
-          pts.push([corners[i][0]*(1-u)+corners[i+1][0]*u, corners[i][1]*(1-u)+corners[i+1][1]*u]);
-        }
-      }
-      pts.push(corners[corners.length-1]);
-      return pts;
-    }
+const MAXR = 0.42;
+
+// ===== GEOMETRY CORE =====
+function circlePath(cx, cy, r, steps = 140) {
+  const p = []; for (let i=0;i<=steps;i++){const a=(i/steps)*Math.PI*2-Math.PI/2;p.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);} return p;
+}
+function polyFromCorners(corners, perSeg = 22) {
+  const p=[]; for(let i=0;i<corners.length-1;i++){for(let t=0;t<perSeg;t++){const u=t/perSeg;p.push([corners[i][0]*(1-u)+corners[i+1][0]*u,corners[i][1]*(1-u)+corners[i+1][1]*u]);}} p.push(corners[corners.length-1]); return p;
+}
+function starCorners(cx,cy,R,r,points=5,rot=-Math.PI/2){const c=[];for(let i=0;i<=points*2;i++){const a=rot+(i/(points*2))*Math.PI*2;const rad=i%2===0?R:r;c.push([cx+Math.cos(a)*rad,cy+Math.sin(a)*rad]);}return c;}
+function starPath(cx,cy,R,r,rot=-Math.PI/2){return polyFromCorners(starCorners(cx,cy,R,r,5,rot),8);}
+function ngon(cx,cy,R,n,rot=-Math.PI/2){const c=[];for(let i=0;i<=n;i++){const a=rot+(i/n)*Math.PI*2;c.push([cx+Math.cos(a)*R,cy+Math.sin(a)*R]);}return c;}
+function triPath(cx,cy,r,rot=-Math.PI/2){return polyFromCorners(ngon(cx,cy,r,3,rot),26);}
+function rectPath(x0,x1,yc,hh){return polyFromCorners([[x0,yc-hh],[x1,yc-hh],[x1,yc+hh],[x0,yc+hh],[x0,yc-hh]],10);}
+function squarePath(x,y,s){return polyFromCorners([[x,y],[x+s,y],[x+s,y+s],[x,y+s],[x,y]],12);}
+function arcPts(cx,cy,r,a0,a1,steps=60){const p=[];for(let i=0;i<=steps;i++){const a=a0+(a1-a0)*(i/steps);p.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);}return p;}
+
+// Tapered bar for China (one end narrower than the other). leftWide flips direction.
+function barTaper(x0, x1, yc, h0, h1, flip){
+  // h0 = half-height at x0 end, h1 = half-height at x1 end
+  if(flip){ const t=h0; h0=h1; h1=t; }
+  return polyFromCorners([[x0,yc-h0],[x1,yc-h1],[x1,yc+h1],[x0,yc+h0],[x0,yc-h0]],10);
+}
+// Flat-bottomed bar: bottom edge horizontal; top edge slopes from h0 (x0) to h1 (x1).
+function flatBar(x0, x1, yc, h0, h1, flip){
+  const base = Math.max(h0,h1);
+  return polyFromCorners([[x0,yc-h0],[x1,yc-h1],[x1,yc+base],[x0,yc+base],[x0,yc-h0]],10);
+}
+// Pentagon-tipped bar matching the PLA roundel reference.
+// Shape: rectangle with one pointed end (5 vertices).
+// Based on Desmos polygon (0,0),(28,0),(29,3),(20,8),(0,8).
+// xW=wide/far end, xP=pointed/near-star end. Works for both bars via direction.
+function bannerBar(xW, xP, yc) {
+  const W = Math.abs(xP - xW);
+  const dir = xP > xW ? 1 : -1;  // +1=points right, -1=points left
+  const h = W * (8/29) * 0.5;    // half-height, preserving aspect ratio from reference
+  // Normalized x offsets from wide end toward tip (from Desmos coords / 29):
+  const xTopCut = W * (20/29);   // where top-right corner cuts in
+  const xBotEnd = W * (28/29);   // where bottom-right corner is
+  // tip is at x=W (full width), y=mid (3/8 of height from bottom = 3/8*2h from bottom = yc - h + 2h*3/8)
+  const yTip = yc - h + 2*h*(3/8);  // = yc - h*0.25  (tip is slightly above center)
+  const corners = [
+    [xW,             yc - h],   // top-left
+    [xW + dir*xTopCut, yc - h], // top-right (where diagonal begins)
+    [xP,             yTip   ],  // tip point
+    [xW + dir*xBotEnd, yc + h], // bottom-right
+    [xW,             yc + h],   // bottom-left
+  ];
+  return polyFromCorners(corners, 10);
+}
+// Rotate a point list about (cx,cy) by ang.// Rotate a point list about (cx,cy) by ang.// Rotate a point list about (cx,cy) by ang.
+function rotPts(pts,cx,cy,ang){return pts.map(([x,y])=>{const dx=x-cx,dy=y-cy;return [cx+dx*Math.cos(ang)-dy*Math.sin(ang), cy+dx*Math.sin(ang)+dy*Math.cos(ang)];});}
+// China PLA emblem: embedded as a raster image so the 八一 (\"eight-one\") characters
+// render exactly as on the real insignia rather than as approximated polygon strokes.
+// 八 = "eight", 一 = "one"; together they refer to 1 August 1927, PLA founding day.
+const CHINA_EMBLEM_URL = 'data:image/png;base64,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';
+const chinaEmblemImg = new Image();
+let chinaEmblemReady = false;
+chinaEmblemImg.onload = () => { chinaEmblemReady = true; try { drawTarget(); } catch(_) {} };
+chinaEmblemImg.src = CHINA_EMBLEM_URL;
+// Taegeuk red region (rest of disc is blue). 90° puts red on top, blue on bottom.
+function taegeukRed(cx,cy,R){
+  const hr=R/2, ang=90*Math.PI/180;
+  let p=arcPts(cx,cy,R,-Math.PI/2,-Math.PI/2-Math.PI,50);
+  p=p.concat(arcPts(cx,cy+hr,hr,Math.PI/2,Math.PI*1.5,30));
+  p=p.concat(arcPts(cx,cy-hr,hr,Math.PI/2,-Math.PI/2,30));
+  return rotPts(p,cx,cy,ang);
+}
+// Seychelles band i (0..4): five oblique bands built from 5 lower rim points connected
+// to 5 upper rim points, so each band is a quadrilateral that fans out toward the top.
+function seyBand(cx,cy,R,i){
+  const lowerDeg=[160, 150, 140, 130, 120, 110];
+  const upperDeg=[160, 248, 300, 350, 402, 452];
+  const la=arcPts(cx,cy,R, lowerDeg[i]*Math.PI/180, lowerDeg[i+1]*Math.PI/180, 6);
+  const ua=arcPts(cx,cy,R, upperDeg[i+1]*Math.PI/180, upperDeg[i]*Math.PI/180, 16);
+  return [...la, ...ua, la[0]];
+}
+function wedgePath(cx,cy,r,a0,a1){return [[cx,cy],...arcPts(cx,cy,r,a0,a1,40),[cx,cy]];}
+// Quadratic bezier sampler
+function quad(p0,pc,p1,steps=18){const out=[];for(let i=0;i<=steps;i++){const t=i/steps,u=1-t;out.push([u*u*p0[0]+2*u*t*pc[0]+t*t*p1[0],u*u*p0[1]+2*u*t*pc[1]+t*t*p1[1]]);}return out;}
+// Balkenkreuz (concave-armed iron cross) as a sampled closed path
+function ironCross(cx,cy,R){
+  const a=R*0.16,t=R*0.98,w=R*0.50,bow=R*0.10;
+  const P=(x,y)=>[cx+x,cy+y];
+  let pts=[];
+  pts.push(P(-a,-a));
+  pts=pts.concat(quad(P(-a,-a),P(-a+bow,-t+bow),P(-w,-t)));
+  pts.push(P(w,-t));
+  pts=pts.concat(quad(P(w,-t),P(a-bow,-t+bow),P(a,-a)));
+  pts=pts.concat(quad(P(a,-a),P(t-bow,-a+bow),P(t,-w)));
+  pts.push(P(t,w));
+  pts=pts.concat(quad(P(t,w),P(t-bow,a-bow),P(a,a)));
+  pts=pts.concat(quad(P(a,a),P(a-bow,t-bow),P(w,t)));
+  pts.push(P(-w,t));
+  pts=pts.concat(quad(P(-w,t),P(-a+bow,t-bow),P(-a,a)));
+  pts=pts.concat(quad(P(-a,a),P(-t+bow,a-bow),P(-t,w)));
+  pts.push(P(-t,-w));
+  pts=pts.concat(quad(P(-t,-w),P(-t+bow,-a+bow),P(-a,-a)));
+  return pts;
+}
+// Maple leaf (geometric, 11-point) — faithful enough as pure geometry
+
+// ============================================================
+// ROUNDEL DEFINITIONS — complete, exact geometry. Each part is a
+// fillable region; tracing order is outermost/boundary first, then
+// inner divisions, matching how the real insignia is layered.
+// ============================================================
+// ============================================================
+// ROUNDEL DEFINITIONS — exact geometry, tagged by era.
+// era: 'wwi' | 'modern' | 'both'. Designs identical across eras
+// are tagged with the single era they live in (per spec, UK/France/
+// Germany live in WWI). USA differs, so it has two entries.
+// ============================================================
+
+// Brazil split-point star: returns {parts} pieces for yellow & green halves.
+function brazilStarParts(cx,cy,Ro,Ri,rot=-Math.PI/2){
+  const tips=[],valleys=[];
+  for(let i=0;i<5;i++){
+    const at=rot+(i/5)*Math.PI*2; tips.push([cx+Math.cos(at)*Ro,cy+Math.sin(at)*Ro]);
+    const av=rot+((i+0.5)/5)*Math.PI*2; valleys.push([cx+Math.cos(av)*Ri,cy+Math.sin(av)*Ri]);
   }
+  const yellow=[], green=[];
+  for(let i=0;i<5;i++){
+    const tip=tips[i], vL=valleys[(i+4)%5], vR=valleys[i];
+    yellow.push([vL,tip,[cx,cy]]);
+    green.push([[cx,cy],tip,vR]);
+  }
+  return {yellow,green};
+}
+
+const ROUNDELS = {
+  // ---------- WWI tab ----------
+  usa_wwi: { name:'USA', era:'wwi', flag:'🇺🇸', diff:'Medium',
+    parts:[
+      {label:'Red rim', color:'#b22234', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R)},
+      {label:'Blue', color:'#1d3a8a', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.64)},
+      {label:'White core', color:'#ffffff', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.32)}
+    ],
+    fact:'The WWI US roundel — red rim, blue, white center. Used before the star-and-bars era.'},
+  france: { name:'France', era:'wwi', flag:'🇫🇷', diff:'Medium',
+    parts:[
+      {label:'Outer', color:'#ed2939', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R)},
+      {label:'White', color:'#ffffff', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.62)},
+      {label:'Blue core', color:'#1959b3', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.30)}
+    ],
+    fact:'The <strong>original</strong> roundel — France, 1912. Unchanged to this day.'},
+  uk: { name:'Great Britain', era:'wwi', flag:'🇬🇧', diff:'Medium',
+    parts:[
+      {label:'Outer', color:'#012169', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R)},
+      {label:'White', color:'#ffffff', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.62)},
+      {label:'Red core', color:'#c8102e', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.30)}
+    ],
+    fact:'Britain flipped France\u2019s colors — red center, blue rim. Still flown today.'},
+  belgium: { name:'Belgium', era:'wwi', flag:'🇧🇪', diff:'Medium',
+    parts:[
+      {label:'Red rim', color:'#b22234', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R)},
+      {label:'Yellow', color:'#fae042', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.64)},
+      {label:'Black core', color:'#1a1a1a', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.32)}
+    ],
+    fact:'Belgium\u2019s WWI roundel — red, yellow, black, the national colors.'},
+  italy: { name:'Italy', era:'wwi', flag:'🇮🇹', diff:'Medium',
+    parts:[
+      {label:'Red rim', color:'#b22234', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R)},
+      {label:'White', color:'#ffffff', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.64)},
+      {label:'Green core', color:'#008c45', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.30)}
+    ],
+    fact:'Italy\u2019s WWI roundel — red, white, green: the tricolor as concentric rings.'},
+  russia_wwi: { name:'Russia', era:'wwi', flag:'🇷🇺', diff:'Medium',
+    parts:[
+      {label:'Red rim', color:'#c8102e', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R)},
+      {label:'Blue', color:'#0039a6', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.84)},
+      {label:'White core', color:'#ffffff', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.66)}
+    ],
+    fact:'Imperial Russia\u2019s WWI roundel — thin red and blue rings around a large white center.'},
+  germany: { name:'Germany', era:'wwi', flag:'🇩🇪', diff:'Hard',
+    parts:[
+      {label:'Iron Cross', color:'#1a1a1a', type:'poly', edge:'#f3f3f3', edgeWidth:10, gen:(cx,cy,R)=>ironCross(cx,cy,R*0.94)}
+    ],
+    fact:'The German <strong>Iron Cross</strong> — a dark cross with a thin white border.'},
+  ottoman: { name:'Ottoman Empire', era:'wwi', flag:'🇹🇷', diff:'Easy',
+    parts:[ {label:'Black square', color:'#2b2118', type:'poly', edge:'#f3f3f3', edgeWidth:8, gen:(cx,cy,R)=>squarePath(cx-R*0.66,cy-R*0.66,R*1.32)} ],
+    fact:'The Ottoman Empire marked aircraft with a simple black square.'},
+  austria: { name:'Austria-Hungary', era:'wwi', flag:'🇦🇹', diff:'Hard',
+    parts:[ {label:'Iron Cross', color:'#3b2f25', type:'poly', edge:'#6b5a48', edgeWidth:3, gen:(cx,cy,R)=>ironCross(cx,cy,R)} ],
+    fact:'Austria-Hungary used a single dark iron cross, like Germany\u2019s but without the white border.'},
+
+  // ---------- Modern tab ----------
+  usa: { name:'USA', era:'modern', flag:'🇺🇸', diff:'Expert',
+    parts:[
+      {label:'Blue border', color:'#1d3a8a', type:'multi',
+        traceGen:(cx,cy,R)=>rectPath(cx-R*1.06, cx+R*1.06, cy, R*0.40),
+        gen:(cx,cy,R)=>[
+          {pts:rectPath(cx-R*1.06, cx-R*0.42, cy, R*0.40), color:'#1d3a8a'},
+          {pts:rectPath(cx+R*0.42, cx+R*1.06, cy, R*0.40), color:'#1d3a8a'},
+          {pts:circlePath(cx,cy,R*0.56), color:'#1d3a8a'}
+        ]},
+      {label:'Left bar', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>rectPath(cx-R*1.0, cx-R*0.46, cy, R*0.33)},
+      {label:'Left red stripe', color:'#c8102e', type:'poly', gen:(cx,cy,R)=>rectPath(cx-R*1.0, cx-R*0.46, cy, R*0.138)},
+      {label:'Right bar', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>rectPath(cx+R*0.46, cx+R*1.0, cy, R*0.33)},
+      {label:'Right red stripe', color:'#c8102e', type:'poly', gen:(cx,cy,R)=>rectPath(cx+R*0.46, cx+R*1.0, cy, R*0.138)},
+      {label:'Blue disc', color:'#1d3a8a', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.50)},
+      {label:'White star', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>starPath(cx,cy,R*0.46,R*0.19)}
+    ],
+    fact:'The modern US <strong>star-and-bars</strong>: white star on blue, a white bar each side with a red stripe, all edged in blue.'},
+  japan: { name:'Japan', era:'modern', flag:'🇯🇵', diff:'Easy',
+    parts:[
+      {label:'White ring', color:'#ffffff', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.88)},
+      {label:'Hinomaru', color:'#bc002d', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.78)}
+    ],
+    fact:'The <strong>Hinomaru</strong> — a red disc with a thin white ring around it.'},
+  mexico: { name:'Mexico', era:'modern', flag:'🇲🇽', diff:'Medium',
+    parts:[
+      {label:'Red triangle', color:'#ce1126', type:'poly', gen:(cx,cy,R)=>triPath(cx,cy-R*0.12,R*1.0,Math.PI/2)},
+      {label:'White triangle', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>triPath(cx,cy-R*0.12,R*0.74,Math.PI/2)},
+      {label:'Green triangle', color:'#006847', type:'poly', gen:(cx,cy,R)=>triPath(cx,cy-R*0.12,R*0.50,Math.PI/2)}
+    ],
+    fact:'Mexico nests a green triangle inside white inside red — all pointing down, the flag\u2019s colors.'},
+  russia: { name:'Russia', era:'modern', flag:'🇷🇺', diff:'Hard',
+    parts:[
+      {label:'White star', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>starPath(cx,cy,R,R*0.42)},
+      {label:'Blue star', color:'#0039a6', type:'poly', gen:(cx,cy,R)=>starPath(cx,cy,R*0.90,R*0.38)},
+      {label:'Red star', color:'#d52b1e', type:'poly', gen:(cx,cy,R)=>starPath(cx,cy,R*0.78,R*0.33)}
+    ],
+    fact:'Modern Russia\u2019s <strong>red star</strong>: red core with white and blue borders.'},
+  china: { name:'China', era:'modern', flag:'🇨🇳', diff:'Hard',
+    parts:[
+      {label:'Left bar', color:'#ed1c23', type:'poly', edge:'#fcfb05', edgeWidth:9, gen:(cx,cy,R)=>bannerBar(cx-R*1.12, cx-R*0.44, cy)},
+      {label:'Right bar', color:'#ed1c23', type:'poly', edge:'#fcfb05', edgeWidth:9, gen:(cx,cy,R)=>bannerBar(cx+R*1.12, cx+R*0.44, cy)},
+      {label:'Red star', color:'#ed1c23', type:'multi', edge:'#fcfb05', image:'china',
+        traceGen:(cx,cy,R)=>starPath(cx,cy+R*0.06,R*0.700,R*0.293),
+        gen:(cx,cy,R)=>[{pts:starPath(cx,cy+R*0.06,R*0.700,R*0.293), color:'#ed1c23', edge:'#fcfb05'}]}
+    ],
+    fact:'The PLA Air Force marking: a yellow-edged <strong>red star</strong> bearing the characters \"eight-one\" (for 1 August 1927, the PLA\'s founding date), flanked by two tapering bars.'},
+  brazil: { name:'Brazil', era:'modern', flag:'🇧🇷', diff:'Expert',
+    parts:[
+      {label:'Star (yellow/green)', color:'#ffdf00', type:'multi',
+        traceGen:(cx,cy,R)=>starPath(cx,cy,R,R*0.42),
+        gen:(cx,cy,R)=>{const b=brazilStarParts(cx,cy,R,R*0.42); return b.yellow.map(t=>({pts:t,color:'#ffdf00'})).concat(b.green.map(t=>({pts:t,color:'#009b3a'})));}},
+      {label:'White ring', color:'#ffffff', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.46)},
+      {label:'Blue disc', color:'#002776', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.40)}
+    ],
+    fact:'Brazil\u2019s roundel: a blue disc and white ring sit on a five-point star whose points are each half yellow, half green.'},
+  poland: { name:'Poland', era:'modern', flag:'🇵🇱', diff:'Hard',
+    parts:[
+      {label:'TL white', color:'#ffffff', type:'bordered', border:'#d4143a', gen:(cx,cy,R)=>{const s=R*0.74;return {x:cx-s,y:cy-s,s};}},
+      {label:'TR red', color:'#d4143a', type:'bordered', border:'#ffffff', gen:(cx,cy,R)=>{const s=R*0.74;return {x:cx,y:cy-s,s};}},
+      {label:'BL red', color:'#d4143a', type:'bordered', border:'#ffffff', gen:(cx,cy,R)=>{const s=R*0.74;return {x:cx-s,y:cy,s};}},
+      {label:'BR white', color:'#ffffff', type:'bordered', border:'#d4143a', gen:(cx,cy,R)=>{const s=R*0.74;return {x:cx,y:cy,s};}}
+    ],
+    fact:'Poland\u2019s <strong>szachownica</strong> — a checkerboard where each square is bordered by the opposite color.'},
+  seychelles: { name:'Seychelles', era:'modern', flag:'🇸🇨', diff:'Expert',
+    parts:[
+      {label:'Blue', color:'#003f87', type:'poly', gen:(cx,cy,R)=>seyBand(cx,cy,R,0)},
+      {label:'Yellow', color:'#fcd856', type:'poly', gen:(cx,cy,R)=>seyBand(cx,cy,R,1)},
+      {label:'Red', color:'#d62828', type:'poly', gen:(cx,cy,R)=>seyBand(cx,cy,R,2)},
+      {label:'White', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>seyBand(cx,cy,R,3)},
+      {label:'Green', color:'#007a33', type:'poly', gen:(cx,cy,R)=>seyBand(cx,cy,R,4)}
+    ],
+    fact:'Seychelles fans five flag colors from the lower-left corner — blue, yellow, red, white, green.'},
+  zimbabwe: { name:'Zimbabwe', era:'modern', flag:'🇿🇼', diff:'Hard',
+    parts:[
+      {label:'Green rim', color:'#006400', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R)},
+      {label:'Yellow', color:'#ffd200', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.80)},
+      {label:'Red', color:'#d40000', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.58)},
+      {label:'Black', color:'#1a1a1a', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.36)},
+      {label:'White core', color:'#ffffff', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.16)}
+    ],
+    fact:'Zimbabwe rings green, yellow, red and black around a white center — the flag\u2019s colors.'},
+  korea: { name:'South Korea', era:'modern', flag:'🇰🇷', diff:'Expert',
+    parts:[
+      {label:'Left bars', color:'#1a1a1a', type:'multi',
+        traceGen:(cx,cy,R)=>rectPath(cx-R*1.0, cx-R*0.62, cy, R*0.30),
+        gen:(cx,cy,R)=>[-0.34,0,0.34].map(yo=>({pts:rectPath(cx-R*1.0, cx-R*0.62, cy+R*yo, R*0.07), color:'#1a1a1a'}))},
+      {label:'Right bars', color:'#1a1a1a', type:'multi',
+        traceGen:(cx,cy,R)=>rectPath(cx+R*0.62, cx+R*1.0, cy, R*0.30),
+        gen:(cx,cy,R)=>[-0.34,0,0.34].map(yo=>({pts:rectPath(cx+R*0.62, cx+R*1.0, cy+R*yo, R*0.07), color:'#1a1a1a'}))},
+      {label:'Blue disc', color:'#0047a0', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.58)},
+      {label:'Red comma', color:'#cd2e3a', type:'poly', gen:(cx,cy,R)=>taegeukRed(cx,cy,R*0.58)}
+    ],
+    fact:'South Korea\u2019s <strong>taegeuk</strong> — red over blue, flanked by three black bars each side.'}
 };
+
 
 // ============================================================
 // STATE
 // ============================================================
 const state = {
-  shape: 'circle',
-  strokes: [],         // array of arrays of [x,y]
+  key: 'france',
+  era: 'wwi',
+  parts: [],          // user strokes, one per traced part (array of [x,y])
+  currentPart: [],
   drawing: false,
   attempts: 0,
   lastScore: null,
   records: {},
-  targetPoints: [],
   canvasW: 600,
   canvasH: 600
 };
 
-// ============================================================
-// CANVAS SETUP
-// ============================================================
 const wrap = document.getElementById('canvasWrap');
 const targetCanvas = document.getElementById('targetCanvas');
 const drawCanvas = document.getElementById('drawCanvas');
@@ -688,92 +630,228 @@ const tCtx = targetCanvas.getContext('2d');
 const dCtx = drawCanvas.getContext('2d');
 const fCtx = fxCanvas.getContext('2d');
 
+function center() { return [state.canvasW/2, state.canvasH/2]; }
+function baseRadius() { return Math.min(state.canvasW, state.canvasH) * MAXR; }
+function def() { return ROUNDELS[state.key]; }
+
+// The outline a user actually traces for a part (used for guide + scoring).
+function partOutline(part, cx, cy, R) {
+  if (part.traceGen) return part.traceGen(cx, cy, R);
+  if (part.type === 'bordered') { const b = part.gen(cx,cy,R); return squarePath(b.x, b.y, b.s); }
+  if (part.type === 'multi') {
+    // fallback: outline = convex-ish hull via the star outline if no traceGen
+    return part.gen(cx,cy,R)[0].pts;
+  }
+  return part.gen(cx, cy, R);
+}
+// Fill a part onto a context (exact rendering), respecting type.
+function fillPart(ctx, part, cx, cy, R, alpha) {
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  if (part.type === 'multi') {
+    // When the part is rendered via a raster image (e.g. China's PLA emblem), skip the
+    // polygon pieces entirely — the image is the sole visual source. The polygon shape
+    // still drives the trace target and scoring via traceGen, but nothing is drawn here.
+    if (!part.image) {
+      for (const piece of part.gen(cx,cy,R)) {
+        ctx.beginPath();
+        ctx.moveTo(piece.pts[0][0], piece.pts[0][1]);
+        for (let i=1;i<piece.pts.length;i++) ctx.lineTo(piece.pts[i][0], piece.pts[i][1]);
+        ctx.closePath();
+        ctx.fillStyle = piece.color; ctx.fill();
+        if (piece.edge) { ctx.strokeStyle = piece.edge; ctx.lineWidth = 3; ctx.lineJoin='round'; ctx.stroke(); }
+      }
+    }
+  } else if (part.type === 'bordered') {
+    const b = part.gen(cx,cy,R), m = b.s*0.16;
+    ctx.fillStyle = part.border; ctx.fillRect(b.x, b.y, b.s, b.s);
+    ctx.fillStyle = part.color;  ctx.fillRect(b.x+m, b.y+m, b.s-2*m, b.s-2*m);
+  } else {
+    const pts = part.gen(cx,cy,R);
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.closePath();
+    ctx.fillStyle = part.color; ctx.fill();
+    if (part.edge) { ctx.strokeStyle = part.edge; ctx.lineWidth = part.edgeWidth || 2; ctx.lineJoin='round'; ctx.stroke(); }
+  }
+  // Optional raster image overlay (e.g. China's PLA emblem with 八一 characters).
+  // Drawn centered, sized to fit just inside the star's outer radius so the image
+  // replaces the geometric character approximation with the exact reference art.
+  if (part.image === 'china' && chinaEmblemReady) {
+    // Star outer radius is R*0.62, so size the image at ~1.32x that to cover the full star.
+    const sz = R * 0.62 * 2.06;
+    // When this is a ghost preview (alpha < 1), dim the image further so the bright
+    // dashed guide and the user's strokes read clearly on top of it. The raster image
+    // has strong saturated colors, so the same alpha that looks faint on a flat polygon
+    // ghost still looks loud here.
+    if (alpha < 1) ctx.globalAlpha = alpha * 0.55;
+    ctx.drawImage(chinaEmblemImg, cx - sz/2, cy - sz/2, sz, sz);
+  }
+  ctx.restore();
+}
+
 function sizeCanvases() {
   const dpr = window.devicePixelRatio || 1;
   const rect = wrap.getBoundingClientRect();
-  state.canvasW = rect.width;
-  state.canvasH = rect.height;
+  state.canvasW = rect.width; state.canvasH = rect.height;
   [targetCanvas, drawCanvas, fxCanvas].forEach(c => {
-    c.width = rect.width * dpr;
-    c.height = rect.height * dpr;
+    c.width = rect.width * dpr; c.height = rect.height * dpr;
     c.getContext('2d').setTransform(dpr, 0, 0, dpr, 0, 0);
   });
-  state.targetPoints = SHAPES[state.shape].generate(rect.width, rect.height);
-  drawTarget();
-  drawUserStrokes();
+  drawTarget(); drawUserParts();
 }
 
+function hexToRgba(hex, a) {
+  const h = hex.replace('#','');
+  const r = parseInt(h.substring(0,2),16), g = parseInt(h.substring(2,4),16), b = parseInt(h.substring(4,6),16);
+  return `rgba(${r},${g},${b},${a})`;
+}
+
+// Draw the faint colored ghost of the insignia + bright guide for current part
 function drawTarget() {
   tCtx.clearRect(0,0,state.canvasW,state.canvasH);
-  const pts = state.targetPoints;
-  if (!pts.length) return;
-  // Dashed ghost guide
-  tCtx.save();
-  tCtx.strokeStyle = 'rgba(255,225,77,0.35)';
-  tCtx.lineWidth = 2;
-  tCtx.setLineDash([6, 8]);
-  tCtx.lineCap = 'round';
-  tCtx.beginPath();
-  tCtx.moveTo(pts[0][0], pts[0][1]);
-  for (let i = 1; i < pts.length; i++) tCtx.lineTo(pts[i][0], pts[i][1]);
-  tCtx.stroke();
-  // Start marker
-  tCtx.setLineDash([]);
-  tCtx.fillStyle = 'rgba(255,225,77,0.9)';
-  tCtx.beginPath();
-  tCtx.arc(pts[0][0], pts[0][1], 5, 0, Math.PI*2);
-  tCtx.fill();
-  tCtx.restore();
+  const [cx, cy] = center();
+  const R = baseRadius();
+  const d = def();
+
+  // Background field (Germany black square, etc.)
+  if (d.bg) {
+    tCtx.fillStyle = hexToRgba(d.bg, 0.12);
+    if (d.bgSquare) { const s = R*d.bgSquare; tCtx.fillRect(cx-s,cy-s,s*2,s*2); }
+    else { tCtx.beginPath(); tCtx.arc(cx,cy,R*(d.bgCircle||1),0,Math.PI*2); tCtx.fill(); }
+  }
+
+  // Faint full preview of every part, in its real color(s), exact geometry.
+  d.parts.forEach(part => {
+    fillPart(tCtx, part, cx, cy, R, 0.16);
+  });
+
+  // Bright dashed guide for the CURRENT part (what to trace next)
+  const idx = state.parts.length;
+  if (idx < d.parts.length) {
+    const part = d.parts[idx];
+    const pts = partOutline(part, cx, cy, R);
+    tCtx.save();
+    tCtx.beginPath();
+    tCtx.moveTo(pts[0][0], pts[0][1]);
+    for (let i=1;i<pts.length;i++) tCtx.lineTo(pts[i][0], pts[i][1]);
+    tCtx.closePath();
+    const guideCol = part.color.toLowerCase() === '#ffffff' ? '#ffe14d' : part.color;
+    tCtx.strokeStyle = hexToRgba(guideCol, 0.95);
+    tCtx.lineWidth = 2.5;
+    tCtx.setLineDash([7, 9]);
+    tCtx.lineJoin = 'round';
+    tCtx.stroke();
+    tCtx.restore();
+    tCtx.fillStyle = hexToRgba('#ffe14d', 0.95);
+    tCtx.beginPath(); tCtx.arc(pts[0][0], pts[0][1], 5, 0, Math.PI*2); tCtx.fill();
+  }
 }
 
-function drawUserStrokes() {
+function drawUserParts() {
   dCtx.clearRect(0,0,state.canvasW,state.canvasH);
-  state.strokes.forEach(stroke => {
+  const d = def();
+  const all = [...state.parts];
+  if (state.currentPart.length) all.push(state.currentPart);
+  all.forEach((stroke, i) => {
     if (stroke.length < 2) return;
+    const part = d.parts[i];
+    const col = part ? part.color : '#f4f1e8';
     dCtx.save();
-    dCtx.strokeStyle = '#f4f1e8';
-    dCtx.lineWidth = 3;
-    dCtx.lineCap = 'round';
-    dCtx.lineJoin = 'round';
-    dCtx.shadowColor = 'rgba(255,61,110,0.5)';
-    dCtx.shadowBlur = 4;
+    dCtx.strokeStyle = col.toLowerCase() === '#ffffff' ? '#f4f1e8' : col;
+    dCtx.lineWidth = 3.5; dCtx.lineCap = 'round'; dCtx.lineJoin = 'round';
+    dCtx.shadowColor = hexToRgba(col, 0.6); dCtx.shadowBlur = 6;
     dCtx.beginPath();
     dCtx.moveTo(stroke[0][0], stroke[0][1]);
-    for (let i = 1; i < stroke.length; i++) dCtx.lineTo(stroke[i][0], stroke[i][1]);
+    for (let j=1;j<stroke.length;j++) dCtx.lineTo(stroke[j][0], stroke[j][1]);
     dCtx.stroke();
     dCtx.restore();
   });
-  document.getElementById('strokeCount').textContent = state.strokes.length;
+  updateRingTracker();
 }
 
-// ============================================================
-// DRAWING INPUT
-// ============================================================
+// Paint the user's traced strokes as FILLED shapes, layered in part order,
+// producing a distorted version of the real insignia. Drawn on the draw canvas.
+function paintDistorted() {
+  const d = def();
+  dCtx.clearRect(0,0,state.canvasW,state.canvasH);
+
+  // Optional background field (Germany white square) using the convex-ish
+  // hull of the relevant stroke isn't needed — just tint behind from the def.
+  if (d.bg) {
+    const [cx, cy] = center(); const R = baseRadius();
+    dCtx.save();
+    dCtx.fillStyle = hexToRgba(d.bg, 0.9);
+    if (d.bgSquare) { const s = R*d.bgSquare; dCtx.fillRect(cx-s, cy-s, s*2, s*2); }
+    else { dCtx.beginPath(); dCtx.arc(cx, cy, R*(d.bgCircle||1), 0, Math.PI*2); dCtx.fill(); }
+    dCtx.restore();
+  }
+
+  state.parts.forEach((stroke, i) => {
+    if (stroke.length < 3) return;
+    const part = d.parts[i];
+    if (!part) return;
+    const [cx, cy] = center(); const R = baseRadius();
+
+    if (part.type === 'multi' || part.type === 'bordered') {
+      // Clip to the user's traced stroke, then render the EXACT fill inside it,
+      // so the split colors / borders follow the hand-drawn shape.
+      dCtx.save();
+      dCtx.beginPath();
+      dCtx.moveTo(stroke[0][0], stroke[0][1]);
+      for (let j=1;j<stroke.length;j++) dCtx.lineTo(stroke[j][0], stroke[j][1]);
+      dCtx.closePath();
+      dCtx.clip();
+      fillPart(dCtx, part, cx, cy, R, 1);
+      dCtx.restore();
+      return;
+    }
+
+    dCtx.save();
+    dCtx.fillStyle = part.color;
+    dCtx.beginPath();
+    dCtx.moveTo(stroke[0][0], stroke[0][1]);
+    for (let j=1;j<stroke.length;j++) dCtx.lineTo(stroke[j][0], stroke[j][1]);
+    dCtx.closePath();
+    dCtx.fill();
+    if (part.edge) { dCtx.strokeStyle = part.edge; dCtx.lineWidth = part.edgeWidth || 2; dCtx.lineJoin = 'round'; dCtx.stroke(); }
+    dCtx.restore();
+  });
+}
 function getPos(e) {
   const rect = drawCanvas.getBoundingClientRect();
   const t = e.touches ? e.touches[0] : e;
   return [t.clientX - rect.left, t.clientY - rect.top];
 }
 function startStroke(e) {
+  // If a scored fill is showing, a new stroke starts a fresh attempt.
+  if (state.scored) {
+    state.scored = false;
+    state.parts = [];
+    drawTarget();
+  }
+  if (state.parts.length >= def().parts.length) return;
   e.preventDefault();
   state.drawing = true;
-  state.strokes.push([getPos(e)]);
+  state.currentPart = [getPos(e)];
   document.getElementById('canvasHint').style.display = 'none';
 }
 function moveStroke(e) {
   if (!state.drawing) return;
   e.preventDefault();
-  const cur = state.strokes[state.strokes.length-1];
   const p = getPos(e);
-  const last = cur[cur.length-1];
-  // Only add if moved enough — keeps point density reasonable
-  if (Math.hypot(p[0]-last[0], p[1]-last[1]) > 1.5) {
-    cur.push(p);
-    drawUserStrokes();
+  const last = state.currentPart[state.currentPart.length-1];
+  if (!last || Math.hypot(p[0]-last[0], p[1]-last[1]) > 1.5) {
+    state.currentPart.push(p); drawUserParts();
   }
 }
 function endStroke() {
+  if (!state.drawing) return;
   state.drawing = false;
+  if (state.currentPart.length > 3) state.parts.push(state.currentPart);
+  state.currentPart = [];
+  drawTarget(); drawUserParts(); updateRingLabel();
 }
 drawCanvas.addEventListener('mousedown', startStroke);
 drawCanvas.addEventListener('mousemove', moveStroke);
@@ -783,290 +861,334 @@ drawCanvas.addEventListener('touchmove', moveStroke, { passive: false });
 window.addEventListener('touchend', endStroke);
 
 // ============================================================
-// SCORING ALGORITHM
-// For every user point, find the closest distance to the
-// target polyline. Average those distances, normalize by
-// canvas size. Also factor in "coverage" — how much of the
-// target curve has a nearby user point. Final = blend.
+// RING/PART TRACKER
+// ============================================================
+function updateRingTracker() {
+  const d = def();
+  const tracker = document.getElementById('ringTracker');
+  tracker.innerHTML = '';
+  d.parts.forEach((part, i) => {
+    const chip = document.createElement('div');
+    const done = i < state.parts.length;
+    const current = i === state.parts.length;
+    chip.className = 'ring-chip' + (done ? ' done' : '') + (current ? ' current' : '');
+    chip.innerHTML = `<span class="swatch" style="background:${part.color}"></span>${part.label}`;
+    tracker.appendChild(chip);
+  });
+}
+function updateRingLabel() {
+  const d = def();
+  const cur = Math.min(state.parts.length + 1, d.parts.length);
+  document.getElementById('ringLabel').textContent = `${cur} / ${d.parts.length}`;
+}
+
+// ============================================================
+// SCORING — generic path matching, works for ANY geometry
+// For each user stroke vs its ideal path:
+//  - fidelity: mean distance from user points to the ideal polyline
+//  - coverage: how much of the ideal path has a nearby user point
+// (closed-ness & roundness fall out of distance-to-path naturally)
 // ============================================================
 function pointToSegmentDist(p, a, b) {
-  const dx = b[0]-a[0], dy = b[1]-a[1];
-  const len2 = dx*dx + dy*dy;
+  const dx=b[0]-a[0], dy=b[1]-a[1];
+  const len2 = dx*dx+dy*dy;
   if (len2 === 0) return Math.hypot(p[0]-a[0], p[1]-a[1]);
-  let t = ((p[0]-a[0])*dx + (p[1]-a[1])*dy) / len2;
+  let t = ((p[0]-a[0])*dx + (p[1]-a[1])*dy)/len2;
   t = Math.max(0, Math.min(1, t));
-  const px = a[0] + t*dx, py = a[1] + t*dy;
-  return Math.hypot(p[0]-px, p[1]-py);
+  return Math.hypot(p[0]-(a[0]+t*dx), p[1]-(a[1]+t*dy));
 }
-function distToPolyline(p, line) {
+function distToPath(p, path) {
   let min = Infinity;
-  for (let i = 0; i < line.length-1; i++) {
-    const d = pointToSegmentDist(p, line[i], line[i+1]);
+  for (let i=0;i<path.length-1;i++) {
+    const d = pointToSegmentDist(p, path[i], path[i+1]);
     if (d < min) min = d;
   }
   return min;
 }
-function computeScore() {
-  // Flatten all user points
-  const userPts = [];
-  state.strokes.forEach(s => s.forEach(p => userPts.push(p)));
-  if (userPts.length < 5) return 0;
+function scorePart(userPts, idealPath, diag) {
+  if (userPts.length < 4) return 0;
+  const good = diag * 0.045;
 
-  const target = state.targetPoints;
-  const diag = Math.hypot(state.canvasW, state.canvasH);
-  // Tolerance threshold = ~5% of canvas diagonal counts as "on target"
-  const goodDist = diag * 0.04;
-
-  // 1. Mean distance from user points to target
+  // fidelity
   let sumD = 0;
-  for (const p of userPts) sumD += distToPolyline(p, target);
+  for (const p of userPts) sumD += distToPath(p, idealPath);
   const meanD = sumD / userPts.length;
-  // Map distance to 0..1 quality (1 = perfect)
-  const fidelity = Math.exp(-meanD / goodDist);
+  const fidelity = Math.exp(-meanD / good);
 
-  // 2. Coverage: what fraction of target points are near a user point?
-  // Sample target every ~10 points for speed
+  // coverage of ideal path
   let covered = 0, sampled = 0;
-  for (let i = 0; i < target.length; i += 4) {
+  for (let i=0;i<idealPath.length;i+=3) {
     sampled++;
     let closest = Infinity;
     for (const u of userPts) {
-      const d = Math.hypot(u[0]-target[i][0], u[1]-target[i][1]);
-      if (d < closest) closest = d;
-      if (closest < goodDist) break;
+      const dd = Math.hypot(u[0]-idealPath[i][0], u[1]-idealPath[i][1]);
+      if (dd < closest) closest = dd;
+      if (closest < good) break;
     }
-    if (closest < goodDist * 1.5) covered++;
+    if (closest < good*1.6) covered++;
   }
   const coverage = covered / sampled;
 
-  // 3. Penalty for excessive strokes on closed shapes (should be ~1)
-  const strokePenalty = SHAPES[state.shape].closed
-    ? Math.max(0.5, 1 - (state.strokes.length - 1) * 0.08)
-    : 1;
-
-  // Blend: fidelity is dominant, coverage gates it
-  const raw = fidelity * 0.55 + coverage * 0.45;
-  const final = Math.round(raw * strokePenalty * 100);
-  return Math.max(0, Math.min(100, final));
+  return Math.max(0, Math.min(1, fidelity*0.55 + coverage*0.45));
+}
+function computeScore() {
+  const d = def();
+  const [cx, cy] = center();
+  const R = baseRadius();
+  const diag = Math.hypot(state.canvasW, state.canvasH);
+  let total = 0;
+  d.parts.forEach((part, i) => {
+    const user = state.parts[i];
+    if (user) total += scorePart(user, partOutline(part, cx, cy, R), diag);
+  });
+  return Math.max(0, Math.min(100, Math.round((total / d.parts.length) * 100)));
 }
 
 // ============================================================
 // SCORE REVEAL + FX
 // ============================================================
-function verdictFor(score) {
-  if (score >= 95) return { text: 'TRANSCENDENT', color: '#ffe14d', emoji: '✦' };
-  if (score >= 85) return { text: 'IMMACULATE',   color: '#7cff6b', emoji: '◆' };
-  if (score >= 70) return { text: 'SOLID',        color: '#4dd4ff', emoji: '●' };
-  if (score >= 55) return { text: 'DECENT',       color: '#ff3d6e', emoji: '△' };
-  if (score >= 35) return { text: 'ROUGH',        color: '#ff8855', emoji: '▽' };
-  if (score >= 15) return { text: 'CHAOTIC',      color: '#ff4d4d', emoji: '✕' };
-  return                  { text: 'WHAT IS THAT', color: '#ff4d4d', emoji: '?' };
+function verdictFor(s) {
+  if (s >= 98) return { text: 'PERFECT', color: '#ffe14d' };
+  if (s >= 94) return { text: 'FLAWLESS', color: '#ffe14d' };
+  if (s >= 89) return { text: 'ACE PILOT', color: '#7cff6b' };
+  if (s >= 83) return { text: 'TOP GUN', color: '#7cff6b' };
+  if (s >= 76) return { text: 'CLEARED', color: '#4dd4ff' };
+  if (s >= 68) return { text: 'STEADY', color: '#4dd4ff' };
+  if (s >= 60) return { text: 'NOT BAD', color: '#9ad0ff' };
+  if (s >= 52) return { text: 'WOBBLY', color: '#ff3d6e' };
+  if (s >= 44) return { text: 'SHAKY', color: '#ff6b8a' };
+  if (s >= 35) return { text: 'GROUNDED', color: '#ff8855' };
+  if (s >= 26) return { text: 'ROUGH', color: '#ff8855' };
+  if (s >= 16) return { text: 'CRASH', color: '#ff4d4d' };
+  if (s >= 8)  return { text: 'MAYDAY', color: '#ff4d4d' };
+  return                  { text: 'IS THAT EVEN IT?', color: '#ff4d4d' };
 }
-
 function showScore(score) {
   const sv = document.getElementById('scoreValue');
   const vd = document.getElementById('scoreVerdict');
   sv.classList.remove('idle');
 
-  // animate counting
-  const startTime = performance.now();
-  const duration = 900;
-  const startVal = state.lastScore ?? 0;
+  // Reveal the distorted insignia: fill the user's strokes, hide the ghost guide.
+  state.scored = true;
+  tCtx.clearRect(0,0,state.canvasW,state.canvasH);
+  paintDistorted();
+
+  const startTime = performance.now(), duration = 900, startVal = state.lastScore ?? 0;
   function tick(t) {
-    const u = Math.min(1, (t - startTime)/duration);
+    const u = Math.min(1, (t-startTime)/duration);
     const e = 1 - Math.pow(1-u, 3);
-    const cur = Math.round(startVal + (score - startVal) * e);
-    sv.textContent = cur;
+    sv.textContent = Math.round(startVal + (score-startVal)*e);
     sv.style.transform = `scale(${1 + (1-Math.abs(0.5-u)*2)*0.05})`;
-    if (u < 1) requestAnimationFrame(tick);
-    else sv.style.transform = '';
+    if (u < 1) requestAnimationFrame(tick); else sv.style.transform = '';
   }
   requestAnimationFrame(tick);
-
   const v = verdictFor(score);
-  vd.textContent = v.text.toLowerCase();
-  vd.style.color = v.color;
-
-  // Big verdict overlay
+  vd.textContent = v.text.toLowerCase(); vd.style.color = v.color;
   const overlay = document.getElementById('verdictOverlay');
   const text = document.getElementById('verdictText');
-  text.textContent = v.text;
-  text.style.color = v.color;
-  overlay.classList.remove('show');
-  void overlay.offsetWidth; // reflow
-  overlay.classList.add('show');
+  text.textContent = v.text; text.style.color = v.color;
+  overlay.classList.remove('show'); void overlay.offsetWidth; overlay.classList.add('show');
   setTimeout(() => overlay.classList.remove('show'), 1500);
-
-  // FX based on score
   fireFx(score, v.color);
-
-  state.lastScore = score;
-  state.attempts++;
+  state.lastScore = score; state.attempts++;
   document.getElementById('attemptCount').textContent = state.attempts;
   updateBest(score);
 }
-
 function fireFx(score, color) {
-  // Pulse ring for high scores
   if (score >= 70) {
     const ring = document.getElementById('pulseRing');
-    ring.style.borderColor = color;
-    ring.classList.remove('fire');
-    void ring.offsetWidth;
-    ring.classList.add('fire');
+    ring.style.borderColor = color; ring.classList.remove('fire'); void ring.offsetWidth; ring.classList.add('fire');
   }
-  // Particle burst on FX canvas
-  const dpr = window.devicePixelRatio || 1;
-  const count = Math.floor(20 + score * 1.2);
-  const particles = [];
-  const cx = state.canvasW / 2;
-  const cy = state.canvasH / 2;
-  for (let i = 0; i < count; i++) {
-    const a = Math.random() * Math.PI * 2;
-    const sp = 2 + Math.random() * (score / 12);
-    particles.push({
-      x: cx, y: cy,
-      vx: Math.cos(a) * sp,
-      vy: Math.sin(a) * sp,
-      life: 1,
-      size: 1 + Math.random() * 3,
-      color: Math.random() < 0.4 ? '#ffe14d' : color
-    });
+  const count = Math.floor(20 + score*1.2);
+  const particles = []; const [cx, cy] = center();
+  for (let i=0;i<count;i++) {
+    const a = Math.random()*Math.PI*2, sp = 2 + Math.random()*(score/12);
+    particles.push({ x:cx, y:cy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp, life:1, size:1+Math.random()*3,
+      color: Math.random()<0.4 ? '#ffe14d' : color });
   }
   let last = performance.now();
   function animate(now) {
-    const dt = (now - last) / 16.67;
-    last = now;
-    fCtx.clearRect(0, 0, state.canvasW, state.canvasH);
+    const dt = (now-last)/16.67; last = now;
+    fCtx.clearRect(0,0,state.canvasW,state.canvasH);
     let alive = 0;
     for (const p of particles) {
       if (p.life <= 0) continue;
       alive++;
-      p.x += p.vx * dt;
-      p.y += p.vy * dt;
-      p.vy += 0.08 * dt; // gravity
-      p.vx *= 0.99;
-      p.life -= 0.012 * dt;
-      fCtx.globalAlpha = Math.max(0, p.life);
-      fCtx.fillStyle = p.color;
-      fCtx.beginPath();
-      fCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      fCtx.fill();
+      p.x += p.vx*dt; p.y += p.vy*dt; p.vy += 0.08*dt; p.vx *= 0.99; p.life -= 0.012*dt;
+      fCtx.globalAlpha = Math.max(0, p.life); fCtx.fillStyle = p.color;
+      fCtx.beginPath(); fCtx.arc(p.x, p.y, p.size, 0, Math.PI*2); fCtx.fill();
     }
     fCtx.globalAlpha = 1;
-    if (alive > 0) requestAnimationFrame(animate);
-    else fCtx.clearRect(0, 0, state.canvasW, state.canvasH);
+    if (alive > 0) requestAnimationFrame(animate); else fCtx.clearRect(0,0,state.canvasW,state.canvasH);
   }
   requestAnimationFrame(animate);
 }
 
 // ============================================================
-// BEST SCORES (persistent storage)
+// PERSISTENT BESTS
 // ============================================================
 async function loadRecords() {
   state.records = {};
-  for (const key of Object.keys(SHAPES)) {
-    try {
-      const r = await window.storage.get('best:' + key);
-      if (r && r.value) state.records[key] = JSON.parse(r.value);
-    } catch (_) { /* key doesn't exist — that's fine */ }
+  for (const key of Object.keys(ROUNDELS)) {
+    try { const r = await window.storage.get('shapeshifter-best:' + key);
+      if (r && r.value) state.records[key] = JSON.parse(r.value); } catch(_) {}
   }
   renderRecords();
 }
 async function updateBest(score) {
-  const prev = state.records[state.shape]?.score ?? -1;
+  const prev = state.records[state.key]?.score ?? -1;
   if (score > prev) {
     const rec = { score, at: Date.now() };
-    state.records[state.shape] = rec;
-    try {
-      await window.storage.set('best:' + state.shape, JSON.stringify(rec));
-    } catch (e) {
-      console.warn('Storage write failed', e);
-    }
-    renderRecords(state.shape);
+    state.records[state.key] = rec;
+    try { await window.storage.set('shapeshifter-best:' + state.key, JSON.stringify(rec)); }
+    catch(e){ console.warn('storage write failed', e); }
+    renderRecords(state.key);
   }
 }
 async function resetRecords() {
-  for (const key of Object.keys(SHAPES)) {
-    try { await window.storage.delete('best:' + key); } catch (_) {}
+  for (const key of Object.keys(ROUNDELS)) {
+    try { await window.storage.delete('shapeshifter-best:' + key); } catch(_) {}
   }
-  state.records = {};
-  renderRecords();
+  state.records = {}; renderRecords();
 }
 function renderRecords(flashKey) {
   const list = document.getElementById('recordsList');
   list.innerHTML = '';
-  for (const key of Object.keys(SHAPES)) {
-    const def = SHAPES[key];
-    const rec = state.records[key];
-    const row = document.createElement('div');
-    row.className = 'record' + (rec ? ' has-score' : '') + (key === flashKey ? ' just-updated' : '');
-    row.innerHTML = `
-      <span class="record-name">${def.icon}<span>${def.name}</span></span>
-      <span class="record-score">${rec ? rec.score + '%' : '—'}</span>
-    `;
-    list.appendChild(row);
+  for (const [era, label] of [['wwi','WWI'], ['modern','Modern']]) {
+    const hdr = document.createElement('div');
+    hdr.className = 'records-era';
+    hdr.textContent = label;
+    list.appendChild(hdr);
+    for (const key of sortedKeys(era)) {
+      const d = ROUNDELS[key]; const rec = state.records[key];
+      const row = document.createElement('div');
+      row.className = 'record' + (rec ? ' has-score' : '') + (key === flashKey ? ' just-updated' : '');
+      row.innerHTML = `<span class="record-name">${d.name}</span>
+        <span class="record-score">${rec ? rec.score + '%' : '—'}</span>`;
+      list.appendChild(row);
+    }
   }
 }
 
 // ============================================================
-// SHAPE PICKER
+// PICKER — accurate mini SVG previews
 // ============================================================
-function renderShapeButtons() {
-  const c = document.getElementById('shapeButtons');
+function svgPolygon(pts, fill, stroke, sw) {
+  return `<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="${fill}" ${stroke?`stroke="${stroke}" stroke-width="${sw||0.5}" stroke-linejoin="round"`:''}/>`;
+}
+function roundelSVG(d) {
+  const size = 38, c = size/2, R = size/2 - 1;
+  let s = '';
+  // bg
+  if (d.bg) {
+    if (d.bgSquare) s += `<rect x="${c-R*d.bgSquare}" y="${c-R*d.bgSquare}" width="${R*d.bgSquare*2}" height="${R*d.bgSquare*2}" fill="${d.bg}"/>`;
+    else s += `<circle cx="${c}" cy="${c}" r="${R*(d.bgCircle||1)}" fill="${d.bg}"/>`;
+  }
+  d.parts.forEach(part => {
+    const fill = part.color;
+    const edge = part.edge || 'rgba(0,0,0,0.15)';
+    if (part.type === 'circle') {
+      const pts = part.gen(c, c, R);
+      const r = Math.hypot(pts[0][0]-c, pts[0][1]-c);
+      s += `<circle cx="${c}" cy="${c}" r="${r}" fill="${fill}" stroke="${edge}" stroke-width="0.5"/>`;
+    } else if (part.type === 'multi') {
+      // When a raster image is the visual source (China), skip the polygon pieces
+      // so the thumbnail isn't a doubled star.
+      if (!part.image) {
+        for (const piece of part.gen(c, c, R)) s += svgPolygon(piece.pts, piece.color, piece.edge||'none', piece.edge?0.6:0.5);
+      }
+      if (part.image === 'china') {
+        const sz = R * 0.62 * 2.06;
+        s += `<image href="${CHINA_EMBLEM_URL}" x="${c-sz/2}" y="${c-sz/2}" width="${sz}" height="${sz}"/>`;
+      }
+    } else if (part.type === 'bordered') {
+      const b = part.gen(c, c, R), m = b.s*0.16;
+      s += `<rect x="${b.x}" y="${b.y}" width="${b.s}" height="${b.s}" fill="${part.border}"/>`;
+      s += `<rect x="${b.x+m}" y="${b.y+m}" width="${b.s-2*m}" height="${b.s-2*m}" fill="${fill}"/>`;
+    } else {
+      s += svgPolygon(part.gen(c, c, R), fill, edge, part.edgeWidth ? part.edgeWidth*0.10 : 0.5);
+    }
+  });
+  return `<svg viewBox="0 0 ${size} ${size}">${s}</svg>`;
+}
+// Keys for an era, sorted alphabetically by display name.
+function sortedKeys(era) {
+  return Object.keys(ROUNDELS)
+    .filter(k => ROUNDELS[k].era === era)
+    .sort((a,b) => ROUNDELS[a].name.localeCompare(ROUNDELS[b].name));
+}
+function renderRoundelButtons() {
+  const c = document.getElementById('roundelButtons');
   c.innerHTML = '';
-  for (const key of Object.keys(SHAPES)) {
-    const def = SHAPES[key];
+  for (const key of sortedKeys(state.era)) {
+    const d = ROUNDELS[key];
     const btn = document.createElement('button');
-    btn.className = 'shape-btn' + (key === state.shape ? ' active' : '');
-    btn.innerHTML = `${def.icon}<span>${def.name}</span>`;
-    btn.onclick = () => selectShape(key);
+    btn.className = 'roundel-btn' + (key === state.key ? ' active' : '');
+    btn.innerHTML = `${roundelSVG(d)}<span>${d.name}</span><span class="diff">${d.diff}</span>`;
+    btn.onclick = () => selectRoundel(key);
     c.appendChild(btn);
   }
 }
-function selectShape(key) {
-  state.shape = key;
-  state.strokes = [];
-  state.lastScore = null;
-  document.getElementById('modeLabel').textContent = SHAPES[key].name;
+function selectEra(era) {
+  state.era = era;
+  document.querySelectorAll('.era-tab').forEach(t => t.classList.toggle('active', t.dataset.era === era));
+  const firstKey = sortedKeys(era)[0];
+  renderRoundelButtons();
+  if (firstKey) selectRoundel(firstKey);
+}
+function selectRoundel(key) {
+  state.key = key; state.parts = []; state.currentPart = []; state.lastScore = null; state.scored = false;
+  const d = def();
+  document.getElementById('modeLabel').textContent = d.name;
   document.getElementById('canvasHint').style.display = '';
+  document.getElementById('canvasHint').textContent =
+    d.parts.length === 1 ? 'Trace the shape' : `Trace each part in order — ${d.parts.length} total`;
   document.getElementById('scoreValue').textContent = '--';
   document.getElementById('scoreValue').classList.add('idle');
-  document.getElementById('scoreVerdict').textContent = 'awaiting attempt';
+  document.getElementById('scoreVerdict').textContent = 'trace, then score';
   document.getElementById('scoreVerdict').style.color = 'var(--ink)';
-  fCtx.clearRect(0, 0, state.canvasW, state.canvasH);
-  renderShapeButtons();
-  sizeCanvases();
+  document.getElementById('factBox').innerHTML = d.fact;
+  fCtx.clearRect(0,0,state.canvasW,state.canvasH);
+  renderRoundelButtons(); updateRingLabel(); sizeCanvases();
 }
 
 // ============================================================
-// WIRE UP CONTROLS
+// CONTROLS
 // ============================================================
+document.getElementById('undoBtn').addEventListener('click', () => {
+  state.scored = false;
+  state.parts.pop(); state.currentPart = [];
+  fCtx.clearRect(0,0,state.canvasW,state.canvasH);
+  drawTarget(); drawUserParts(); updateRingLabel();
+});
 document.getElementById('clearBtn').addEventListener('click', () => {
-  state.strokes = [];
-  fCtx.clearRect(0, 0, state.canvasW, state.canvasH);
+  state.scored = false;
+  state.parts = []; state.currentPart = [];
+  fCtx.clearRect(0,0,state.canvasW,state.canvasH);
   document.getElementById('canvasHint').style.display = '';
-  drawUserStrokes();
+  drawTarget(); drawUserParts(); updateRingLabel();
 });
 document.getElementById('scoreBtn').addEventListener('click', () => {
-  if (state.strokes.length === 0) {
-    document.getElementById('scoreVerdict').textContent = 'draw something first';
-    document.getElementById('scoreVerdict').style.color = 'var(--ink-dim)';
+  if (state.parts.length === 0) {
+    const vd = document.getElementById('scoreVerdict');
+    vd.textContent = 'trace at least one part first'; vd.style.color = 'var(--ink-dim)';
     return;
   }
-  const s = computeScore();
-  showScore(s);
+  showScore(computeScore());
 });
 document.getElementById('resetBtn').addEventListener('click', async () => {
-  if (confirm('Wipe all best scores?')) await resetRecords();
+  if (confirm('Wipe all personal bests?')) await resetRecords();
+});
+document.querySelectorAll('.era-tab').forEach(tab => {
+  tab.addEventListener('click', () => selectEra(tab.dataset.era));
 });
 
 // ============================================================
 // INIT
 // ============================================================
 window.addEventListener('resize', sizeCanvases);
-renderShapeButtons();
-selectShape('circle');
+renderRoundelButtons();
+selectRoundel('france');
 loadRecords();
 </script>
 </body>
