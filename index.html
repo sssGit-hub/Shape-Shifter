@@ -389,6 +389,14 @@ function taegeukRed(cx,cy,R){
   let p=arcPts(cx,cy,R,-Math.PI/2,-Math.PI/2-Math.PI,50);
   p=p.concat(arcPts(cx,cy+hr,hr,Math.PI/2,Math.PI*1.5,30));
   p=p.concat(arcPts(cx,cy-hr,hr,Math.PI/2,-Math.PI/2,30));
+  // Rotate 90° then flip horizontally to match reference orientation
+  return rotPts(p,cx,cy,ang).map(([x,y])=>[2*cx-x, y]);
+}
+function taegeukSCurve(cx,cy,R){
+  // S-curve divider in the same rotated space: two inner semicircles, rotated 90°.
+  const hr=R/2, ang=90*Math.PI/180;
+  let p=arcPts(cx,cy-hr,hr,Math.PI/2,-Math.PI/2,40)
+   .concat(arcPts(cx,cy+hr,hr,Math.PI/2,Math.PI*1.5,40));
   return rotPts(p,cx,cy,ang);
 }
 // Seychelles band i (0..4): five oblique bands built from 5 lower rim points connected
@@ -513,17 +521,17 @@ const ROUNDELS = {
   usa: { name:'USA', era:'modern', flag:'🇺🇸', diff:'Expert',
     parts:[
       {label:'Blue border', color:'#1d3a8a', type:'multi',
-        traceGen:(cx,cy,R)=>rectPath(cx-R*1.06, cx+R*1.06, cy, R*0.40),
+        traceGen:(cx,cy,R)=>rectPath(cx-R*1.06, cx+R*1.06, cy, R*0.26),
         gen:(cx,cy,R)=>[
-          {pts:rectPath(cx-R*1.06, cx-R*0.42, cy, R*0.40), color:'#1d3a8a'},
-          {pts:rectPath(cx+R*0.42, cx+R*1.06, cy, R*0.40), color:'#1d3a8a'},
-          {pts:circlePath(cx,cy,R*0.56), color:'#1d3a8a'}
+          {pts:rectPath(cx-R*1.06, cx-R*0.42, cy, R*0.26), color:'#1d3a8a'},
+          {pts:rectPath(cx+R*0.42, cx+R*1.06, cy, R*0.26), color:'#1d3a8a'},
+          {pts:circlePath(cx,cy,R*0.50), color:'#1d3a8a'}
         ]},
-      {label:'Left bar', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>rectPath(cx-R*1.0, cx-R*0.46, cy, R*0.33)},
-      {label:'Left red stripe', color:'#c8102e', type:'poly', gen:(cx,cy,R)=>rectPath(cx-R*1.0, cx-R*0.46, cy, R*0.138)},
-      {label:'Right bar', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>rectPath(cx+R*0.46, cx+R*1.0, cy, R*0.33)},
-      {label:'Right red stripe', color:'#c8102e', type:'poly', gen:(cx,cy,R)=>rectPath(cx+R*0.46, cx+R*1.0, cy, R*0.138)},
-      {label:'Blue disc', color:'#1d3a8a', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.50)},
+      {label:'Left bar', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>rectPath(cx-R*1.0, cx-R*0.46, cy, R*0.20)},
+      {label:'Left red stripe', color:'#c8102e', type:'poly', gen:(cx,cy,R)=>rectPath(cx-R*1.0, cx-R*0.46, cy, R*0.08)},
+      {label:'Right bar', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>rectPath(cx+R*0.46, cx+R*1.0, cy, R*0.20)},
+      {label:'Right red stripe', color:'#c8102e', type:'poly', gen:(cx,cy,R)=>rectPath(cx+R*0.46, cx+R*1.0, cy, R*0.08)},
+      {label:'Blue disc', color:'#1d3a8a', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.46)},
       {label:'White star', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>starPath(cx,cy,R*0.46,R*0.19)}
     ],
     fact:'The modern US <strong>star-and-bars</strong>: white star on blue, a white bar each side with a red stripe, all edged in blue.'},
@@ -542,15 +550,15 @@ const ROUNDELS = {
     fact:'Mexico nests a green triangle inside white inside red — all pointing down, the flag\u2019s colors.'},
   russia: { name:'Russia', era:'modern', flag:'🇷🇺', diff:'Hard',
     parts:[
-      {label:'White star', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>starPath(cx,cy,R,R*0.42)},
+      {label:'White star', color:'#ffffff', type:'poly', edge:'#d52b1e', edgeWidth:2, gen:(cx,cy,R)=>starPath(cx,cy,R,R*0.42)},
       {label:'Blue star', color:'#0039a6', type:'poly', gen:(cx,cy,R)=>starPath(cx,cy,R*0.90,R*0.38)},
       {label:'Red star', color:'#d52b1e', type:'poly', gen:(cx,cy,R)=>starPath(cx,cy,R*0.78,R*0.33)}
     ],
     fact:'Modern Russia\u2019s <strong>red star</strong>: red core with white and blue borders.'},
   china: { name:'China', era:'modern', flag:'🇨🇳', diff:'Hard',
     parts:[
-      {label:'Left bar', color:'#ed1c23', type:'poly', edge:'#fcfb05', edgeWidth:9, gen:(cx,cy,R)=>bannerBar(cx-R*1.12, cx-R*0.44, cy)},
-      {label:'Right bar', color:'#ed1c23', type:'poly', edge:'#fcfb05', edgeWidth:9, gen:(cx,cy,R)=>bannerBar(cx+R*1.12, cx+R*0.44, cy)},
+      {label:'Left bar', color:'#ed1c23', type:'poly', edge:'#fcfb05', edgeWidth:9, gen:(cx,cy,R)=>bannerBar(cx-R*1.12, cx-R*0.56, cy)},
+      {label:'Right bar', color:'#ed1c23', type:'poly', edge:'#fcfb05', edgeWidth:9, gen:(cx,cy,R)=>bannerBar(cx+R*1.12, cx+R*0.56, cy)},
       {label:'Red star', color:'#ed1c23', type:'multi', edge:'#fcfb05', image:'china',
         traceGen:(cx,cy,R)=>starPath(cx,cy+R*0.06,R*0.700,R*0.293),
         gen:(cx,cy,R)=>[{pts:starPath(cx,cy+R*0.06,R*0.700,R*0.293), color:'#ed1c23', edge:'#fcfb05'}]}
@@ -558,19 +566,23 @@ const ROUNDELS = {
     fact:'The PLA Air Force marking: a yellow-edged <strong>red star</strong> bearing the characters \"eight-one\" (for 1 August 1927, the PLA\'s founding date), flanked by two tapering bars.'},
   brazil: { name:'Brazil', era:'modern', flag:'🇧🇷', diff:'Expert',
     parts:[
-      {label:'Star (yellow/green)', color:'#ffdf00', type:'multi',
+      {label:'Star (green/yellow)', color:'#009b3a', type:'multi',
         traceGen:(cx,cy,R)=>starPath(cx,cy,R,R*0.42),
-        gen:(cx,cy,R)=>{const b=brazilStarParts(cx,cy,R,R*0.42); return b.yellow.map(t=>({pts:t,color:'#ffdf00'})).concat(b.green.map(t=>({pts:t,color:'#009b3a'})));}},
+        gen:(cx,cy,R)=>{const b=brazilStarParts(cx,cy,R,R*0.42); return b.yellow.map(t=>({pts:t,color:'#009b3a'})).concat(b.green.map(t=>({pts:t,color:'#ffdf00'})));}},
       {label:'White ring', color:'#ffffff', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.46)},
       {label:'Blue disc', color:'#002776', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.40)}
     ],
     fact:'Brazil\u2019s roundel: a blue disc and white ring sit on a five-point star whose points are each half yellow, half green.'},
   poland: { name:'Poland', era:'modern', flag:'🇵🇱', diff:'Hard',
     parts:[
-      {label:'TL white', color:'#ffffff', type:'bordered', border:'#d4143a', gen:(cx,cy,R)=>{const s=R*0.74;return {x:cx-s,y:cy-s,s};}},
-      {label:'TR red', color:'#d4143a', type:'bordered', border:'#ffffff', gen:(cx,cy,R)=>{const s=R*0.74;return {x:cx,y:cy-s,s};}},
-      {label:'BL red', color:'#d4143a', type:'bordered', border:'#ffffff', gen:(cx,cy,R)=>{const s=R*0.74;return {x:cx-s,y:cy,s};}},
-      {label:'BR white', color:'#ffffff', type:'bordered', border:'#d4143a', gen:(cx,cy,R)=>{const s=R*0.74;return {x:cx,y:cy,s};}}
+      {label:'TL outer', color:'#d4143a', type:'poly', gen:(cx,cy,R)=>{const O=R*0.84;return polyFromCorners([[cx,cy],[cx,cy-O],[cx-O,cy-O],[cx-O,cy],[cx,cy]],12);}},
+      {label:'TR outer', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>{const O=R*0.84;return polyFromCorners([[cx,cy],[cx,cy-O],[cx+O,cy-O],[cx+O,cy],[cx,cy]],12);}},
+      {label:'BL outer', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>{const O=R*0.84;return polyFromCorners([[cx,cy],[cx,cy+O],[cx-O,cy+O],[cx-O,cy],[cx,cy]],12);}},
+      {label:'BR outer', color:'#d4143a', type:'poly', gen:(cx,cy,R)=>{const O=R*0.84;return polyFromCorners([[cx,cy],[cx,cy+O],[cx+O,cy+O],[cx+O,cy],[cx,cy]],12);}},
+      {label:'TL inner', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>{const I=R*0.56;return polyFromCorners([[cx,cy],[cx,cy-I],[cx-I,cy-I],[cx-I,cy],[cx,cy]],12);}},
+      {label:'TR inner', color:'#d4143a', type:'poly', gen:(cx,cy,R)=>{const I=R*0.56;return polyFromCorners([[cx,cy],[cx,cy-I],[cx+I,cy-I],[cx+I,cy],[cx,cy]],12);}},
+      {label:'BL inner', color:'#d4143a', type:'poly', gen:(cx,cy,R)=>{const I=R*0.56;return polyFromCorners([[cx,cy],[cx,cy+I],[cx-I,cy+I],[cx-I,cy],[cx,cy]],12);}},
+      {label:'BR inner', color:'#ffffff', type:'poly', gen:(cx,cy,R)=>{const I=R*0.56;return polyFromCorners([[cx,cy],[cx,cy+I],[cx+I,cy+I],[cx+I,cy],[cx,cy]],12);}}
     ],
     fact:'Poland\u2019s <strong>szachownica</strong> — a checkerboard where each square is bordered by the opposite color.'},
   seychelles: { name:'Seychelles', era:'modern', flag:'🇸🇨', diff:'Expert',
@@ -594,11 +606,11 @@ const ROUNDELS = {
   korea: { name:'South Korea', era:'modern', flag:'🇰🇷', diff:'Expert',
     parts:[
       {label:'Left bars', color:'#1a1a1a', type:'multi',
-        traceGen:(cx,cy,R)=>rectPath(cx-R*1.0, cx-R*0.62, cy, R*0.30),
-        gen:(cx,cy,R)=>[-0.34,0,0.34].map(yo=>({pts:rectPath(cx-R*1.0, cx-R*0.62, cy+R*yo, R*0.07), color:'#1a1a1a'}))},
+        traceGen:(cx,cy,R)=>rectPath(cx-R*1.15, cx-R*0.70, cy, R*0.24),
+        gen:(cx,cy,R)=>[-0.16,0,0.16].map(yo=>({pts:rectPath(cx-R*1.15, cx-R*0.70, cy+R*yo, R*0.06), color:'#1a1a1a'}))},
       {label:'Right bars', color:'#1a1a1a', type:'multi',
-        traceGen:(cx,cy,R)=>rectPath(cx+R*0.62, cx+R*1.0, cy, R*0.30),
-        gen:(cx,cy,R)=>[-0.34,0,0.34].map(yo=>({pts:rectPath(cx+R*0.62, cx+R*1.0, cy+R*yo, R*0.07), color:'#1a1a1a'}))},
+        traceGen:(cx,cy,R)=>rectPath(cx+R*0.70, cx+R*1.15, cy, R*0.24),
+        gen:(cx,cy,R)=>[-0.16,0,0.16].map(yo=>({pts:rectPath(cx+R*0.70, cx+R*1.15, cy+R*yo, R*0.06), color:'#1a1a1a'}))},
       {label:'Blue disc', color:'#0047a0', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R*0.58)},
       {label:'Red comma', color:'#cd2e3a', type:'poly', gen:(cx,cy,R)=>taegeukRed(cx,cy,R*0.58)}
     ],
@@ -636,6 +648,7 @@ function def() { return ROUNDELS[state.key]; }
 
 // The outline a user actually traces for a part (used for guide + scoring).
 function partOutline(part, cx, cy, R) {
+  if (part.type === 'scurve') return [[cx,cy],[cx,cy]];
   if (part.traceGen) return part.traceGen(cx, cy, R);
   if (part.type === 'bordered') { const b = part.gen(cx,cy,R); return squarePath(b.x, b.y, b.s); }
   if (part.type === 'multi') {
@@ -662,10 +675,27 @@ function fillPart(ctx, part, cx, cy, R, alpha) {
         if (piece.edge) { ctx.strokeStyle = piece.edge; ctx.lineWidth = 3; ctx.lineJoin='round'; ctx.stroke(); }
       }
     }
+  } else if (part.type === 'scurve') {
+    const pts = part.gen(cx, cy, R);
+    ctx.save();
+    ctx.strokeStyle = part.color;
+    ctx.lineWidth = Math.max(2, R * 0.04);
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath();
+    ctx.moveTo(pts[0][0], pts[0][1]);
+    for (let i=1;i<pts.length;i++) ctx.lineTo(pts[i][0], pts[i][1]);
+    ctx.stroke();
+    ctx.restore();
   } else if (part.type === 'bordered') {
     const b = part.gen(cx,cy,R), m = b.s*0.16;
     ctx.fillStyle = part.border; ctx.fillRect(b.x, b.y, b.s, b.s);
-    ctx.fillStyle = part.color;  ctx.fillRect(b.x+m, b.y+m, b.s-2*m, b.s-2*m);
+    // Quadrant-aware inset: only inset the 2 outer sides, inner sides extend to center.
+    const q = part.quad;
+    const ix = (q==='tl'||q==='bl') ? b.x+m : b.x;      // left inset for tl/bl only
+    const iy = (q==='tl'||q==='tr') ? b.y+m : b.y;      // top inset for tl/tr only
+    const iw = b.s - m - (q==='tr'||q==='br' ? m : 0);  // right inset for tr/br only
+    const ih = b.s - m - (q==='bl'||q==='br' ? m : 0);  // bottom inset for bl/br only
+    ctx.fillStyle = part.color; ctx.fillRect(ix, iy, iw, ih);
   } else {
     const pts = part.gen(cx,cy,R);
     ctx.beginPath();
@@ -878,8 +908,9 @@ function updateRingTracker() {
 }
 function updateRingLabel() {
   const d = def();
-  const cur = Math.min(state.parts.length + 1, d.parts.length);
-  document.getElementById('ringLabel').textContent = `${cur} / ${d.parts.length}`;
+  const traceable = d.parts.filter(p=>p.type!=='scurve').length;
+  const cur = Math.min(state.parts.length + 1, traceable);
+  document.getElementById('ringLabel').textContent = `${cur} / ${traceable}`;
 }
 
 // ============================================================
@@ -937,11 +968,14 @@ function computeScore() {
   const R = baseRadius();
   const diag = Math.hypot(state.canvasW, state.canvasH);
   let total = 0;
+  let scorableCount = 0;
   d.parts.forEach((part, i) => {
+    if (part.type === 'scurve') return;
+    scorableCount++;
     const user = state.parts[i];
     if (user) total += scorePart(user, partOutline(part, cx, cy, R), diag);
   });
-  return Math.max(0, Math.min(100, Math.round((total / d.parts.length) * 100)));
+  return Math.max(0, Math.min(100, Math.round((total / scorableCount) * 100)));
 }
 
 // ============================================================
@@ -1101,10 +1135,16 @@ function roundelSVG(d) {
         const sz = R * 0.62 * 2.06;
         s += `<image href="${CHINA_EMBLEM_URL}" x="${c-sz/2}" y="${c-sz/2}" width="${sz}" height="${sz}"/>`;
       }
+
+    } else if (part.type === 'scurve') {
+      // white S-curve — skip at thumbnail size
     } else if (part.type === 'bordered') {
       const b = part.gen(c, c, R), m = b.s*0.16;
       s += `<rect x="${b.x}" y="${b.y}" width="${b.s}" height="${b.s}" fill="${part.border}"/>`;
-      s += `<rect x="${b.x+m}" y="${b.y+m}" width="${b.s-2*m}" height="${b.s-2*m}" fill="${fill}"/>`;
+      const q=part.quad;
+      const ix=(q==='tl'||q==='bl')?b.x+m:b.x, iy=(q==='tl'||q==='tr')?b.y+m:b.y;
+      const iw=b.s-m-(q==='tr'||q==='br'?m:0), ih=b.s-m-(q==='bl'||q==='br'?m:0);
+      s += `<rect x="${ix}" y="${iy}" width="${iw}" height="${ih}" fill="${fill}"/>`;
     } else {
       s += svgPolygon(part.gen(c, c, R), fill, edge, part.edgeWidth ? part.edgeWidth*0.10 : 0.5);
     }
