@@ -249,7 +249,7 @@
     font-size: 10px; color: var(--ink-dim); letter-spacing: 0.2em; text-transform: uppercase;
   }
 
-  /* ── Language toggle ── */
+
   .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
   .lang-toggle { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
   .lang-btn {
@@ -261,7 +261,7 @@
   .lang-btn:hover { color: var(--ink); }
   .lang-btn.active { background: var(--accent); color: var(--bg); }
 
-  /* ── Instruction overlay ── */
+
   #instrOverlay {
     position: fixed; inset: 0; z-index: 100;
     background: rgba(10,10,15,0.88);
@@ -328,7 +328,7 @@
 <body>
 <div class="app">
 
-  <!-- First-time instruction overlay -->
+
   <div id="instrOverlay">
     <div class="instr-card">
       <div class="instr-lang lang-toggle">
@@ -340,24 +340,24 @@
 
       <div class="instr-demo">
         <svg viewBox="0 0 240 96" xmlns="http://www.w3.org/2000/svg">
-          <!-- LEFT: the dashed guide circle -->
+
           <circle cx="55" cy="40" r="26" fill="none"
             stroke="rgba(255,61,110,0.7)" stroke-width="2.5"
             stroke-dasharray="6 7">
             <animateTransform attributeName="transform" type="rotate"
               from="0 55 40" to="360 55 40" dur="8s" repeatCount="indefinite"/>
           </circle>
-          <!-- Start dot on guide -->
+
           <circle cx="55" cy="14" r="4.5" fill="#ffe14d"/>
 
-          <!-- Center arrow -->
+
           <line x1="98" y1="40" x2="136" y2="40" stroke="rgba(255,255,255,0.35)"
             stroke-width="1.5"/>
           <path d="M 132,35 L 140,40 L 132,45" fill="none"
             stroke="rgba(255,255,255,0.35)" stroke-width="1.5"
             stroke-linecap="round" stroke-linejoin="round"/>
 
-          <!-- RIGHT: the hand-drawn trace over a faint guide -->
+
           <circle cx="185" cy="40" r="26" fill="none"
             stroke="rgba(255,61,110,0.22)" stroke-width="2"
             stroke-dasharray="6 7"/>
@@ -367,10 +367,10 @@
             <animate attributeName="stroke-dashoffset" from="170" to="0"
               dur="2.2s" repeatCount="indefinite" begin="0.4s"/>
           </path>
-          <!-- Start dot on trace -->
+
           <circle cx="185" cy="14.8" r="4.5" fill="#ffe14d"/>
 
-          <!-- Labels: aligned under each circle center, clear of the shapes -->
+
           <text x="55" y="90" font-family="JetBrains Mono,monospace" font-size="9"
             fill="rgba(255,255,255,0.4)" text-anchor="middle" letter-spacing="2" data-i18n="guide">GUIDE</text>
           <text x="185" y="90" font-family="JetBrains Mono,monospace" font-size="9"
@@ -472,17 +472,9 @@
 </div>
 
 <script>
-// ============================================================
-// GEOMETRY HELPERS
-// Each roundel is a list of PARTS you trace in order.
-// A part has: { label, color, type, ...params } and a
-// generate(cx,cy,R) -> ordered [x,y] points (the ideal path).
-// type drives both the scorer and the ghost rendering.
-// types: 'circle' | 'polyline' (closed shapes too) 
-// ============================================================
+
 const MAXR = 0.42;
 
-// ===== GEOMETRY CORE =====
 function circlePath(cx, cy, r, steps = 140) {
   const p = []; for (let i=0;i<=steps;i++){const a=(i/steps)*Math.PI*2-Math.PI/2;p.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);} return p;
 }
@@ -497,67 +489,60 @@ function rectPath(x0,x1,yc,hh){return polyFromCorners([[x0,yc-hh],[x1,yc-hh],[x1
 function squarePath(x,y,s){return polyFromCorners([[x,y],[x+s,y],[x+s,y+s],[x,y+s],[x,y]],12);}
 function arcPts(cx,cy,r,a0,a1,steps=60){const p=[];for(let i=0;i<=steps;i++){const a=a0+(a1-a0)*(i/steps);p.push([cx+Math.cos(a)*r,cy+Math.sin(a)*r]);}return p;}
 
-// Tapered bar for China (one end narrower than the other). leftWide flips direction.
 function barTaper(x0, x1, yc, h0, h1, flip){
-  // h0 = half-height at x0 end, h1 = half-height at x1 end
+
   if(flip){ const t=h0; h0=h1; h1=t; }
   return polyFromCorners([[x0,yc-h0],[x1,yc-h1],[x1,yc+h1],[x0,yc+h0],[x0,yc-h0]],10);
 }
-// Flat-bottomed bar: bottom edge horizontal; top edge slopes from h0 (x0) to h1 (x1).
+
 function flatBar(x0, x1, yc, h0, h1, flip){
   const base = Math.max(h0,h1);
   return polyFromCorners([[x0,yc-h0],[x1,yc-h1],[x1,yc+base],[x0,yc+base],[x0,yc-h0]],10);
 }
-// Pentagon-tipped bar matching the PLA roundel reference.
-// Shape: rectangle with one pointed end (5 vertices).
-// Based on Desmos polygon (0,0),(28,0),(29,3),(20,8),(0,8).
-// xW=wide/far end, xP=pointed/near-star end. Works for both bars via direction.
+
 function bannerBar(xW, xP, yc) {
   const W = Math.abs(xP - xW);
-  const dir = xP > xW ? 1 : -1;  // +1=points right, -1=points left
-  const h = W * (8/29) * 0.5;    // half-height, preserving aspect ratio from reference
-  // Normalized x offsets from wide end toward tip (from Desmos coords / 29):
-  const xTopCut = W * (20/29);   // where top-right corner cuts in
-  const xBotEnd = W * (28/29);   // where bottom-right corner is
-  // tip is at x=W (full width), y=mid (3/8 of height from bottom = 3/8*2h from bottom = yc - h + 2h*3/8)
-  const yTip = yc - h + 2*h*(3/8);  // = yc - h*0.25  (tip is slightly above center)
+  const dir = xP > xW ? 1 : -1;
+  const h = W * (8/29) * 0.5;
+
+  const xTopCut = W * (20/29);
+  const xBotEnd = W * (28/29);
+
+  const yTip = yc - h + 2*h*(3/8);
   const corners = [
-    [xW,             yc - h],   // top-left
-    [xW + dir*xTopCut, yc - h], // top-right (where diagonal begins)
-    [xP,             yTip   ],  // tip point
-    [xW + dir*xBotEnd, yc + h], // bottom-right
-    [xW,             yc + h],   // bottom-left
+    [xW,             yc - h],
+    [xW + dir*xTopCut, yc - h],
+    [xP,             yTip   ],
+    [xW + dir*xBotEnd, yc + h],
+    [xW,             yc + h],
   ];
   return polyFromCorners(corners, 10);
 }
-// Rotate a point list about (cx,cy) by ang.// Rotate a point list about (cx,cy) by ang.// Rotate a point list about (cx,cy) by ang.
+
 function rotPts(pts,cx,cy,ang){return pts.map(([x,y])=>{const dx=x-cx,dy=y-cy;return [cx+dx*Math.cos(ang)-dy*Math.sin(ang), cy+dx*Math.sin(ang)+dy*Math.cos(ang)];});}
-// China PLA emblem: embedded as a raster image so the 八一 (\"eight-one\") characters
-// render exactly as on the real insignia rather than as approximated polygon strokes.
-// 八 = "eight", 一 = "one"; together they refer to 1 August 1927, PLA founding day.
+
 const CHINA_EMBLEM_URL = 'data:image/png;base64,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';
 const chinaEmblemImg = new Image();
 let chinaEmblemReady = false;
 chinaEmblemImg.onload = () => { chinaEmblemReady = true; try { drawTarget(); } catch(_) {} };
 chinaEmblemImg.src = CHINA_EMBLEM_URL;
-// Taegeuk red region (rest of disc is blue). 90° puts red on top, blue on bottom.
+
 function taegeukRed(cx,cy,R){
   const hr=R/2, ang=90*Math.PI/180;
   let p=arcPts(cx,cy,R,-Math.PI/2,-Math.PI/2-Math.PI,50);
   p=p.concat(arcPts(cx,cy+hr,hr,Math.PI/2,Math.PI*1.5,30));
   p=p.concat(arcPts(cx,cy-hr,hr,Math.PI/2,-Math.PI/2,30));
-  // Rotate 90° then flip horizontally to match reference orientation
+
   return rotPts(p,cx,cy,ang).map(([x,y])=>[2*cx-x, y]);
 }
 function taegeukSCurve(cx,cy,R){
-  // S-curve divider in the same rotated space: two inner semicircles, rotated 90°.
+
   const hr=R/2, ang=90*Math.PI/180;
   let p=arcPts(cx,cy-hr,hr,Math.PI/2,-Math.PI/2,40)
    .concat(arcPts(cx,cy+hr,hr,Math.PI/2,Math.PI*1.5,40));
   return rotPts(p,cx,cy,ang);
 }
-// Seychelles band i (0..4): five oblique bands built from 5 lower rim points connected
-// to 5 upper rim points, so each band is a quadrilateral that fans out toward the top.
+
 function seyBand(cx,cy,R,i){
   const lowerDeg=[160, 150, 140, 130, 120, 110];
   const upperDeg=[160, 248, 300, 350, 402, 452];
@@ -566,9 +551,9 @@ function seyBand(cx,cy,R,i){
   return [...la, ...ua, la[0]];
 }
 function wedgePath(cx,cy,r,a0,a1){return [[cx,cy],...arcPts(cx,cy,r,a0,a1,40),[cx,cy]];}
-// Quadratic bezier sampler
+
 function quad(p0,pc,p1,steps=18){const out=[];for(let i=0;i<=steps;i++){const t=i/steps,u=1-t;out.push([u*u*p0[0]+2*u*t*pc[0]+t*t*p1[0],u*u*p0[1]+2*u*t*pc[1]+t*t*p1[1]]);}return out;}
-// Balkenkreuz (concave-armed iron cross) as a sampled closed path
+
 function ironCross(cx,cy,R){
   const a=R*0.16,t=R*0.98,w=R*0.50,bow=R*0.10;
   const P=(x,y)=>[cx+x,cy+y];
@@ -588,21 +573,7 @@ function ironCross(cx,cy,R){
   pts=pts.concat(quad(P(-t,-w),P(-t+bow,-a+bow),P(-a,-a)));
   return pts;
 }
-// Maple leaf (geometric, 11-point) — faithful enough as pure geometry
 
-// ============================================================
-// ROUNDEL DEFINITIONS — complete, exact geometry. Each part is a
-// fillable region; tracing order is outermost/boundary first, then
-// inner divisions, matching how the real insignia is layered.
-// ============================================================
-// ============================================================
-// ROUNDEL DEFINITIONS — exact geometry, tagged by era.
-// era: 'wwi' | 'modern' | 'both'. Designs identical across eras
-// are tagged with the single era they live in (per spec, UK/France/
-// Germany live in WWI). USA differs, so it has two entries.
-// ============================================================
-
-// Brazil split-point star: returns {parts} pieces for yellow & green halves.
 function brazilStarParts(cx,cy,Ro,Ri,rot=-Math.PI/2){
   const tips=[],valleys=[];
   for(let i=0;i<5;i++){
@@ -619,7 +590,7 @@ function brazilStarParts(cx,cy,Ro,Ri,rot=-Math.PI/2){
 }
 
 const ROUNDELS = {
-  // ---------- WWI tab ----------
+
   usa_wwi: { name:'USA', era:'wwi', flag:'🇺🇸', diff:'Medium',
     parts:[
       {label:'Red rim', color:'#b22234', type:'circle', gen:(cx,cy,R)=>circlePath(cx,cy,R)},
@@ -674,7 +645,7 @@ const ROUNDELS = {
     parts:[ {label:'Iron Cross', color:'#3b2f25', type:'poly', edge:'#6b5a48', edgeWidth:3, gen:(cx,cy,R)=>ironCross(cx,cy,R)} ],
     fact:'Austria-Hungary used a single dark iron cross, like Germany\u2019s but without the white border.'},
 
-  // ---------- Modern tab ----------
+
   usa: { name:'USA', era:'modern', flag:'🇺🇸', diff:'Expert',
     parts:[
       {label:'Blue border', color:'#1d3a8a', type:'multi',
@@ -774,18 +745,12 @@ const ROUNDELS = {
     fact:'South Korea\u2019s <strong>taegeuk</strong> — red over blue, flanked by three black bars each side.'}
 };
 
-
-
-// ============================================================
-// I18N — English / Spanish
-// t(s) translates a runtime string; UI_ES holds static-key strings.
-// ============================================================
 let LANG = 'en';
 
 const UI_ES = {
   tagline: 'Traza las insignias de las fuerzas aéreas del mundo.',
   theArena: '// la arena',
-  wwi: 'WWI',
+  wwi: 'I G.M.',
   modern: 'Moderno',
   traceEachPart: 'Traza cada parte de la insignia',
   undo: 'Deshacer',
@@ -811,19 +776,18 @@ const UI_ES = {
   you: 'TÚ'
 };
 
-// Runtime strings (part labels, country names, difficulty, verdicts, facts, hints)
 const ES = {
-  // ── Difficulty ──
+
   'Easy':'Fácil', 'Medium':'Medio', 'Hard':'Difícil', 'Expert':'Experto',
 
-  // ── Country names ──
+
   'USA':'EE. UU.', 'France':'Francia', 'Great Britain':'Gran Bretaña', 'Belgium':'Bélgica',
   'Italy':'Italia', 'Russia':'Rusia', 'Germany':'Alemania', 'Ottoman Empire':'Imperio otomano',
   'Austria-Hungary':'Austria-Hungría', 'Japan':'Japón', 'Mexico':'México', 'China':'China',
   'Brazil':'Brasil', 'Poland':'Polonia', 'Seychelles':'Seychelles', 'Zimbabwe':'Zimbabue',
   'South Korea':'Corea del Sur',
 
-  // ── Part labels ──
+
   'Red rim':'Borde rojo', 'Blue':'Azul', 'White core':'Centro blanco', 'Outer':'Exterior',
   'White':'Blanco', 'Blue core':'Centro azul', 'Red core':'Centro rojo', 'Yellow':'Amarillo',
   'Black core':'Centro negro', 'Green core':'Centro verde', 'Iron Cross':'Cruz de Hierro',
@@ -840,19 +804,19 @@ const ES = {
   'Black':'Negro', 'Left bars':'Barras izquierdas', 'Right bars':'Barras derechas',
   'Red comma':'Coma roja',
 
-  // ── Verdicts ──
+
   'PERFECT':'PERFECTO', 'FLAWLESS':'IMPECABLE', 'ACE PILOT':'AS DEL AIRE', 'TOP GUN':'ÉLITE',
   'CLEARED':'APROBADO', 'STEADY':'ESTABLE', 'NOT BAD':'NADA MAL', 'WOBBLY':'TEMBLOROSO',
   'SHAKY':'INSEGURO', 'GROUNDED':'EN TIERRA', 'ROUGH':'TOSCO', 'CRASH':'ACCIDENTE',
   'MAYDAY':'MAYDAY', 'IS THAT EVEN IT?':'¿ESO QUÉ ES?',
 
-  // ── Misc runtime ──
+
   'trace, then score':'traza, luego puntúa',
   'trace at least one part first':'traza al menos una parte primero',
   'Trace the shape':'Traza la figura',
   'Wipe all personal bests?':'¿Borrar todas las mejores marcas?',
 
-  // ── Facts ──
+
   'The WWI US roundel — red rim, blue, white center. Used before the star-and-bars era.':
     'El roundel estadounidense de la I G.M.: borde rojo, azul y centro blanco. Anterior a la era de la estrella y barras.',
   'The <strong>original</strong> roundel — France, 1912. Unchanged to this day.':
@@ -898,7 +862,6 @@ function t(s) {
   return ES[s] !== undefined ? ES[s] : s;
 }
 
-// Apply translations to all statically-tagged elements.
 function applyStaticI18n() {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     const k = el.dataset.i18n;
@@ -913,7 +876,6 @@ function applyStaticI18n() {
   document.documentElement.lang = LANG;
 }
 
-// Re-render everything that contains translated runtime strings.
 function refreshLangUI() {
   applyStaticI18n();
   renderRoundelButtons();
@@ -929,7 +891,7 @@ function refreshLangUI() {
     : (LANG === 'es'
         ? `Traza cada parte en orden — ${d.parts.length} en total`
         : `Trace each part in order — ${d.parts.length} total`);
-  // Verdict line: re-render whichever state we're in.
+
   const vd = document.getElementById('scoreVerdict');
   if (state.lastScore == null) {
     vd.textContent = t('trace, then score');
@@ -947,13 +909,10 @@ async function setLang(lang) {
   try { await window.storage.set('shapeshifter-lang', lang); } catch(_) {}
 }
 
-// ============================================================
-// STATE
-// ============================================================
 const state = {
   key: 'france',
   era: 'wwi',
-  parts: [],          // user strokes, one per traced part (array of [x,y])
+  parts: [],
   currentPart: [],
   drawing: false,
   attempts: 0,
@@ -975,25 +934,24 @@ function center() { return [state.canvasW/2, state.canvasH/2]; }
 function baseRadius() { return Math.min(state.canvasW, state.canvasH) * MAXR; }
 function def() { return ROUNDELS[state.key]; }
 
-// The outline a user actually traces for a part (used for guide + scoring).
 function partOutline(part, cx, cy, R) {
   if (part.type === 'scurve') return [[cx,cy],[cx,cy]];
   if (part.traceGen) return part.traceGen(cx, cy, R);
   if (part.type === 'bordered') { const b = part.gen(cx,cy,R); return squarePath(b.x, b.y, b.s); }
   if (part.type === 'multi') {
-    // fallback: outline = convex-ish hull via the star outline if no traceGen
+
     return part.gen(cx,cy,R)[0].pts;
   }
   return part.gen(cx, cy, R);
 }
-// Fill a part onto a context (exact rendering), respecting type.
+
 function fillPart(ctx, part, cx, cy, R, alpha) {
   ctx.save();
   ctx.globalAlpha = alpha;
   if (part.type === 'multi') {
-    // When the part is rendered via a raster image (e.g. China's PLA emblem), skip the
-    // polygon pieces entirely — the image is the sole visual source. The polygon shape
-    // still drives the trace target and scoring via traceGen, but nothing is drawn here.
+
+
+
     if (!part.image) {
       for (const piece of part.gen(cx,cy,R)) {
         ctx.beginPath();
@@ -1018,12 +976,12 @@ function fillPart(ctx, part, cx, cy, R, alpha) {
   } else if (part.type === 'bordered') {
     const b = part.gen(cx,cy,R), m = b.s*0.16;
     ctx.fillStyle = part.border; ctx.fillRect(b.x, b.y, b.s, b.s);
-    // Quadrant-aware inset: only inset the 2 outer sides, inner sides extend to center.
+
     const q = part.quad;
-    const ix = (q==='tl'||q==='bl') ? b.x+m : b.x;      // left inset for tl/bl only
-    const iy = (q==='tl'||q==='tr') ? b.y+m : b.y;      // top inset for tl/tr only
-    const iw = b.s - m - (q==='tr'||q==='br' ? m : 0);  // right inset for tr/br only
-    const ih = b.s - m - (q==='bl'||q==='br' ? m : 0);  // bottom inset for bl/br only
+    const ix = (q==='tl'||q==='bl') ? b.x+m : b.x;
+    const iy = (q==='tl'||q==='tr') ? b.y+m : b.y;
+    const iw = b.s - m - (q==='tr'||q==='br' ? m : 0);
+    const ih = b.s - m - (q==='bl'||q==='br' ? m : 0);
     ctx.fillStyle = part.color; ctx.fillRect(ix, iy, iw, ih);
   } else {
     const pts = part.gen(cx,cy,R);
@@ -1034,16 +992,16 @@ function fillPart(ctx, part, cx, cy, R, alpha) {
     ctx.fillStyle = part.color; ctx.fill();
     if (part.edge) { ctx.strokeStyle = part.edge; ctx.lineWidth = part.edgeWidth || 2; ctx.lineJoin='round'; ctx.stroke(); }
   }
-  // Optional raster image overlay (e.g. China's PLA emblem with 八一 characters).
-  // Drawn centered, sized to fit just inside the star's outer radius so the image
-  // replaces the geometric character approximation with the exact reference art.
+
+
+
   if (part.image === 'china' && chinaEmblemReady) {
-    // Star outer radius is R*0.62, so size the image at ~1.32x that to cover the full star.
+
     const sz = R * 0.62 * 2.06;
-    // When this is a ghost preview (alpha < 1), dim the image further so the bright
-    // dashed guide and the user's strokes read clearly on top of it. The raster image
-    // has strong saturated colors, so the same alpha that looks faint on a flat polygon
-    // ghost still looks loud here.
+
+
+
+
     if (alpha < 1) ctx.globalAlpha = alpha * 0.55;
     ctx.drawImage(chinaEmblemImg, cx - sz/2, cy - sz/2, sz, sz);
   }
@@ -1067,26 +1025,25 @@ function hexToRgba(hex, a) {
   return `rgba(${r},${g},${b},${a})`;
 }
 
-// Draw the faint colored ghost of the insignia + bright guide for current part
 function drawTarget() {
   tCtx.clearRect(0,0,state.canvasW,state.canvasH);
   const [cx, cy] = center();
   const R = baseRadius();
   const d = def();
 
-  // Background field (Germany black square, etc.)
+
   if (d.bg) {
     tCtx.fillStyle = hexToRgba(d.bg, 0.12);
     if (d.bgSquare) { const s = R*d.bgSquare; tCtx.fillRect(cx-s,cy-s,s*2,s*2); }
     else { tCtx.beginPath(); tCtx.arc(cx,cy,R*(d.bgCircle||1),0,Math.PI*2); tCtx.fill(); }
   }
 
-  // Faint full preview of every part, in its real color(s), exact geometry.
+
   d.parts.forEach(part => {
     fillPart(tCtx, part, cx, cy, R, 0.16);
   });
 
-  // Bright dashed guide for the CURRENT part (what to trace next)
+
   const idx = state.parts.length;
   if (idx < d.parts.length) {
     const part = d.parts[idx];
@@ -1130,14 +1087,12 @@ function drawUserParts() {
   updateRingTracker();
 }
 
-// Paint the user's traced strokes as FILLED shapes, layered in part order,
-// producing a distorted version of the real insignia. Drawn on the draw canvas.
 function paintDistorted() {
   const d = def();
   dCtx.clearRect(0,0,state.canvasW,state.canvasH);
 
-  // Optional background field (Germany white square) using the convex-ish
-  // hull of the relevant stroke isn't needed — just tint behind from the def.
+
+
   if (d.bg) {
     const [cx, cy] = center(); const R = baseRadius();
     dCtx.save();
@@ -1154,8 +1109,8 @@ function paintDistorted() {
     const [cx, cy] = center(); const R = baseRadius();
 
     if (part.type === 'multi' || part.type === 'bordered') {
-      // Clip to the user's traced stroke, then render the EXACT fill inside it,
-      // so the split colors / borders follow the hand-drawn shape.
+
+
       dCtx.save();
       dCtx.beginPath();
       dCtx.moveTo(stroke[0][0], stroke[0][1]);
@@ -1184,7 +1139,7 @@ function getPos(e) {
   return [t.clientX - rect.left, t.clientY - rect.top];
 }
 function startStroke(e) {
-  // If a scored fill is showing, a new stroke starts a fresh attempt.
+
   if (state.scored) {
     state.scored = false;
     state.parts = [];
@@ -1219,9 +1174,6 @@ drawCanvas.addEventListener('touchstart', startStroke, { passive: false });
 drawCanvas.addEventListener('touchmove', moveStroke, { passive: false });
 window.addEventListener('touchend', endStroke);
 
-// ============================================================
-// RING/PART TRACKER
-// ============================================================
 function updateRingTracker() {
   const d = def();
   const tracker = document.getElementById('ringTracker');
@@ -1242,13 +1194,6 @@ function updateRingLabel() {
   document.getElementById('ringLabel').textContent = `${cur} / ${traceable}`;
 }
 
-// ============================================================
-// SCORING — generic path matching, works for ANY geometry
-// For each user stroke vs its ideal path:
-//  - fidelity: mean distance from user points to the ideal polyline
-//  - coverage: how much of the ideal path has a nearby user point
-// (closed-ness & roundness fall out of distance-to-path naturally)
-// ============================================================
 function pointToSegmentDist(p, a, b) {
   const dx=b[0]-a[0], dy=b[1]-a[1];
   const len2 = dx*dx+dy*dy;
@@ -1269,13 +1214,13 @@ function scorePart(userPts, idealPath, diag) {
   if (userPts.length < 4) return 0;
   const good = diag * 0.045;
 
-  // fidelity
+
   let sumD = 0;
   for (const p of userPts) sumD += distToPath(p, idealPath);
   const meanD = sumD / userPts.length;
   const fidelity = Math.exp(-meanD / good);
 
-  // coverage of ideal path
+
   let covered = 0, sampled = 0;
   for (let i=0;i<idealPath.length;i+=3) {
     sampled++;
@@ -1307,9 +1252,6 @@ function computeScore() {
   return Math.max(0, Math.min(100, Math.round((total / scorableCount) * 100)));
 }
 
-// ============================================================
-// SCORE REVEAL + FX
-// ============================================================
 function verdictFor(s) {
   if (s >= 98) return { text: 'PERFECT', color: '#ffe14d' };
   if (s >= 94) return { text: 'FLAWLESS', color: '#ffe14d' };
@@ -1331,7 +1273,7 @@ function showScore(score) {
   const vd = document.getElementById('scoreVerdict');
   sv.classList.remove('idle');
 
-  // Reveal the distorted insignia: fill the user's strokes, hide the ghost guide.
+
   state.scored = true;
   tCtx.clearRect(0,0,state.canvasW,state.canvasH);
   paintDistorted();
@@ -1387,9 +1329,6 @@ function fireFx(score, color) {
   requestAnimationFrame(animate);
 }
 
-// ============================================================
-// PERSISTENT BESTS
-// ============================================================
 async function loadRecords() {
   state.records = {};
   for (const key of Object.keys(ROUNDELS)) {
@@ -1433,16 +1372,13 @@ function renderRecords(flashKey) {
   }
 }
 
-// ============================================================
-// PICKER — accurate mini SVG previews
-// ============================================================
 function svgPolygon(pts, fill, stroke, sw) {
   return `<polygon points="${pts.map(p=>p.join(',')).join(' ')}" fill="${fill}" ${stroke?`stroke="${stroke}" stroke-width="${sw||0.5}" stroke-linejoin="round"`:''}/>`;
 }
 function roundelSVG(d) {
   const size = 38, c = size/2, R = size/2 - 1;
   let s = '';
-  // bg
+
   if (d.bg) {
     if (d.bgSquare) s += `<rect x="${c-R*d.bgSquare}" y="${c-R*d.bgSquare}" width="${R*d.bgSquare*2}" height="${R*d.bgSquare*2}" fill="${d.bg}"/>`;
     else s += `<circle cx="${c}" cy="${c}" r="${R*(d.bgCircle||1)}" fill="${d.bg}"/>`;
@@ -1455,8 +1391,8 @@ function roundelSVG(d) {
       const r = Math.hypot(pts[0][0]-c, pts[0][1]-c);
       s += `<circle cx="${c}" cy="${c}" r="${r}" fill="${fill}" stroke="${edge}" stroke-width="0.5"/>`;
     } else if (part.type === 'multi') {
-      // When a raster image is the visual source (China), skip the polygon pieces
-      // so the thumbnail isn't a doubled star.
+
+
       if (!part.image) {
         for (const piece of part.gen(c, c, R)) s += svgPolygon(piece.pts, piece.color, piece.edge||'none', piece.edge?0.6:0.5);
       }
@@ -1466,7 +1402,7 @@ function roundelSVG(d) {
       }
 
     } else if (part.type === 'scurve') {
-      // white S-curve — skip at thumbnail size
+
     } else if (part.type === 'bordered') {
       const b = part.gen(c, c, R), m = b.s*0.16;
       s += `<rect x="${b.x}" y="${b.y}" width="${b.s}" height="${b.s}" fill="${part.border}"/>`;
@@ -1480,7 +1416,7 @@ function roundelSVG(d) {
   });
   return `<svg viewBox="0 0 ${size} ${size}">${s}</svg>`;
 }
-// Keys for an era, sorted alphabetically by display name.
+
 function sortedKeys(era) {
   return Object.keys(ROUNDELS)
     .filter(k => ROUNDELS[k].era === era)
@@ -1523,9 +1459,6 @@ function selectRoundel(key) {
   renderRoundelButtons(); updateRingLabel(); sizeCanvases();
 }
 
-// ============================================================
-// CONTROLS
-// ============================================================
 document.getElementById('undoBtn').addEventListener('click', () => {
   state.scored = false;
   state.parts.pop(); state.currentPart = [];
@@ -1554,26 +1487,21 @@ document.querySelectorAll('.era-tab').forEach(tab => {
   tab.addEventListener('click', () => selectEra(tab.dataset.era));
 });
 
-// ============================================================
-// INIT
-// ============================================================
 window.addEventListener('resize', sizeCanvases);
 renderRoundelButtons();
 selectRoundel('france');
 loadRecords();
 
-// ── Language toggle ──────────────────────────────────────────────────────
 document.querySelectorAll('.lang-btn').forEach(b =>
   b.addEventListener('click', () => setLang(b.dataset.lang)));
 (async () => {
   let saved = null;
   try { const r = await window.storage.get('shapeshifter-lang'); saved = r && r.value; } catch(_) {}
-  // Fall back to the browser's language when nothing is saved yet.
+
   if (!saved && (navigator.language || '').toLowerCase().startsWith('es')) saved = 'es';
   if (saved === 'es') setLang('es'); else applyStaticI18n();
 })();
 
-// ── Instruction overlay ──────────────────────────────────────────────────
 (async () => {
   let seen = false;
   try { const r = await window.storage.get('shapeshifter-seen-intro'); seen = r && r.value === '1'; } catch(_) {}
