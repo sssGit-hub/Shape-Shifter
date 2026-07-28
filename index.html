@@ -249,6 +249,18 @@
     font-size: 10px; color: var(--ink-dim); letter-spacing: 0.2em; text-transform: uppercase;
   }
 
+  /* ── Language toggle ── */
+  .header-right { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .lang-toggle { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 2px; overflow: hidden; }
+  .lang-btn {
+    background: transparent; border: none; color: var(--ink-dim);
+    font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.12em; text-transform: uppercase; padding: 6px 12px;
+    cursor: pointer; transition: all 0.15s ease;
+  }
+  .lang-btn:hover { color: var(--ink); }
+  .lang-btn.active { background: var(--accent); color: var(--bg); }
+
   /* ── Instruction overlay ── */
   #instrOverlay {
     position: fixed; inset: 0; z-index: 100;
@@ -265,6 +277,10 @@
     border-radius: 4px; padding: 36px 40px 32px;
     max-width: 420px; width: 90%; text-align: center;
     position: relative;
+  }
+  .instr-lang {
+    position: absolute; top: 14px; right: 14px;
+    display: flex; border: 1px solid var(--border); border-radius: 2px; overflow: hidden;
   }
   .instr-tag {
     font-family: 'JetBrains Mono', monospace; font-size: 10px;
@@ -315,8 +331,12 @@
   <!-- First-time instruction overlay -->
   <div id="instrOverlay">
     <div class="instr-card">
-      <div class="instr-tag">// how to play</div>
-      <div class="instr-title">Trace the<br>Dotted Line</div>
+      <div class="instr-lang lang-toggle">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+      </div>
+      <div class="instr-tag" data-i18n="howToPlay">// how to play</div>
+      <div class="instr-title" data-i18n-html="instrTitle">Trace the<br>Dotted Line</div>
 
       <div class="instr-demo">
         <svg viewBox="0 0 240 96" xmlns="http://www.w3.org/2000/svg">
@@ -352,13 +372,13 @@
 
           <!-- Labels: aligned under each circle center, clear of the shapes -->
           <text x="55" y="90" font-family="JetBrains Mono,monospace" font-size="9"
-            fill="rgba(255,255,255,0.4)" text-anchor="middle" letter-spacing="2">GUIDE</text>
+            fill="rgba(255,255,255,0.4)" text-anchor="middle" letter-spacing="2" data-i18n="guide">GUIDE</text>
           <text x="185" y="90" font-family="JetBrains Mono,monospace" font-size="9"
-            fill="rgba(255,255,255,0.4)" text-anchor="middle" letter-spacing="2">YOU</text>
+            fill="rgba(255,255,255,0.4)" text-anchor="middle" letter-spacing="2" data-i18n="you">YOU</text>
         </svg>
       </div>
 
-      <div class="instr-body">
+      <div class="instr-body" data-i18n-html="instrBody">
         Each insignia is shown as a faint ghost with a
         <strong>dashed outline</strong>. Draw over that line with your
         mouse or finger to trace it.
@@ -367,33 +387,39 @@
       <div class="instr-steps">
         <div class="instr-step">
           <span class="step-num">1</span>
-          Pick an insignia from the grid
+          <span data-i18n="step1">Pick an insignia from the grid</span>
         </div>
         <div class="instr-step">
           <span class="step-num">2</span>
-          Trace the dashed line on the canvas
+          <span data-i18n="step2">Trace the dashed line on the canvas</span>
         </div>
         <div class="instr-step">
           <span class="step-num">3</span>
-          Hit Score to see how accurate you were
+          <span data-i18n="step3">Hit Score to see how accurate you were</span>
         </div>
       </div>
 
-      <button class="instr-go" id="instrGoBtn">Got it — let's fly</button>
+      <button class="instr-go" id="instrGoBtn" data-i18n="gotIt">Got it — let's fly</button>
     </div>
   </div>
 
   <header>
     <div class="logo">SHAPE<span class="dot">·</span>SHIFTER</div>
-    <div class="tag">Trace the insignia of the world's air forces.</div>
+    <div class="header-right">
+      <div class="lang-toggle" id="langToggle">
+        <button class="lang-btn active" data-lang="en">EN</button>
+        <button class="lang-btn" data-lang="es">ES</button>
+      </div>
+      <div class="tag" data-i18n="tagline">Trace the insignia of the world's air forces.</div>
+    </div>
   </header>
 
   <div class="main">
     <div class="panel">
-      <span class="panel-label">// the arena</span>
+      <span class="panel-label" data-i18n="theArena">// the arena</span>
       <div class="era-tabs" id="eraTabs">
-        <button class="era-tab active" data-era="wwi">WWI</button>
-        <button class="era-tab" data-era="modern">Modern</button>
+        <button class="era-tab active" data-era="wwi" data-i18n="wwi">WWI</button>
+        <button class="era-tab" data-era="modern" data-i18n="modern">Modern</button>
       </div>
       <div class="roundels" id="roundelButtons"></div>
 
@@ -405,44 +431,44 @@
         <div class="verdict-overlay" id="verdictOverlay">
           <div class="verdict-text" id="verdictText"></div>
         </div>
-        <div class="canvas-hint" id="canvasHint">Trace each part of the insignia</div>
+        <div class="canvas-hint" id="canvasHint" data-i18n="traceEachPart">Trace each part of the insignia</div>
       </div>
 
       <div class="ring-tracker" id="ringTracker"></div>
 
       <div class="controls">
-        <button class="btn" id="undoBtn">Undo</button>
-        <button class="btn" id="clearBtn">Clear</button>
-        <button class="btn primary" id="scoreBtn">Score</button>
+        <button class="btn" id="undoBtn" data-i18n="undo">Undo</button>
+        <button class="btn" id="clearBtn" data-i18n="clear">Clear</button>
+        <button class="btn primary" id="scoreBtn" data-i18n="score">Score</button>
       </div>
 
       <div class="statusbar">
-        <span>Insignia <strong id="modeLabel">—</strong></span>
-        <span>Part <strong id="ringLabel">1 / 1</strong></span>
-        <span>Attempts <strong id="attemptCount">0</strong></span>
+        <span><span data-i18n="insignia">Insignia</span> <strong id="modeLabel">—</strong></span>
+        <span><span data-i18n="part">Part</span> <strong id="ringLabel">1 / 1</strong></span>
+        <span><span data-i18n="attempts">Attempts</span> <strong id="attemptCount">0</strong></span>
       </div>
     </div>
 
     <aside class="sidebar">
       <div class="panel">
-        <span class="panel-label">// current run</span>
+        <span class="panel-label" data-i18n="currentRun">// current run</span>
         <div class="score-display">
-          <div class="score-label">Accuracy</div>
+          <div class="score-label" data-i18n="accuracy">Accuracy</div>
           <div><span class="score-value idle" id="scoreValue">--</span><span class="score-suffix">%</span></div>
-          <div class="score-verdict" id="scoreVerdict">pick an insignia to begin</div>
+          <div class="score-verdict" id="scoreVerdict" data-i18n="pickToBegin">pick an insignia to begin</div>
         </div>
         <div class="fact" id="factBox"></div>
       </div>
 
       <div class="panel">
-        <span class="panel-label">// personal bests</span>
+        <span class="panel-label" data-i18n="personalBests">// personal bests</span>
         <div class="records" id="recordsList"></div>
-        <button class="reset-link" id="resetBtn">↺ Reset all records</button>
+        <button class="reset-link" id="resetBtn" data-i18n="resetAll">↺ Reset all records</button>
       </div>
     </aside>
   </div>
 
-  <footer>Roundels are flags for military airplanes</footer>
+  <footer data-i18n="footer">Roundels are flags for military airplanes</footer>
 </div>
 
 <script>
@@ -749,6 +775,178 @@ const ROUNDELS = {
 };
 
 
+
+// ============================================================
+// I18N — English / Spanish
+// t(s) translates a runtime string; UI_ES holds static-key strings.
+// ============================================================
+let LANG = 'en';
+
+const UI_ES = {
+  tagline: 'Traza las insignias de las fuerzas aéreas del mundo.',
+  theArena: '// la arena',
+  wwi: 'WWI',
+  modern: 'Moderno',
+  traceEachPart: 'Traza cada parte de la insignia',
+  undo: 'Deshacer',
+  clear: 'Borrar',
+  score: 'Puntuar',
+  insignia: 'Insignia',
+  part: 'Parte',
+  attempts: 'Intentos',
+  currentRun: '// ronda actual',
+  accuracy: 'Precisión',
+  pickToBegin: 'elige una insignia para empezar',
+  personalBests: '// mejores marcas',
+  resetAll: '↺ Borrar todas las marcas',
+  footer: 'Los roundeles son banderas para aviones militares',
+  howToPlay: '// cómo jugar',
+  instrTitle: 'Traza la<br>Línea Punteada',
+  instrBody: 'Cada insignia aparece como una silueta tenue con un <strong>contorno punteado</strong>. Dibuja sobre esa línea con el ratón o el dedo para trazarla.',
+  step1: 'Elige una insignia de la cuadrícula',
+  step2: 'Traza la línea punteada en el lienzo',
+  step3: 'Pulsa Puntuar para ver tu precisión',
+  gotIt: 'Entendido — ¡a volar!',
+  guide: 'GUÍA',
+  you: 'TÚ'
+};
+
+// Runtime strings (part labels, country names, difficulty, verdicts, facts, hints)
+const ES = {
+  // ── Difficulty ──
+  'Easy':'Fácil', 'Medium':'Medio', 'Hard':'Difícil', 'Expert':'Experto',
+
+  // ── Country names ──
+  'USA':'EE. UU.', 'France':'Francia', 'Great Britain':'Gran Bretaña', 'Belgium':'Bélgica',
+  'Italy':'Italia', 'Russia':'Rusia', 'Germany':'Alemania', 'Ottoman Empire':'Imperio otomano',
+  'Austria-Hungary':'Austria-Hungría', 'Japan':'Japón', 'Mexico':'México', 'China':'China',
+  'Brazil':'Brasil', 'Poland':'Polonia', 'Seychelles':'Seychelles', 'Zimbabwe':'Zimbabue',
+  'South Korea':'Corea del Sur',
+
+  // ── Part labels ──
+  'Red rim':'Borde rojo', 'Blue':'Azul', 'White core':'Centro blanco', 'Outer':'Exterior',
+  'White':'Blanco', 'Blue core':'Centro azul', 'Red core':'Centro rojo', 'Yellow':'Amarillo',
+  'Black core':'Centro negro', 'Green core':'Centro verde', 'Iron Cross':'Cruz de Hierro',
+  'Black square':'Cuadrado negro', 'Blue border':'Borde azul', 'Left bar':'Barra izquierda',
+  'Left red stripe':'Franja roja izquierda', 'Right bar':'Barra derecha',
+  'Right red stripe':'Franja roja derecha', 'Blue disc':'Disco azul', 'White star':'Estrella blanca',
+  'White ring':'Anillo blanco', 'Hinomaru':'Hinomaru', 'Red triangle':'Triángulo rojo',
+  'White triangle':'Triángulo blanco', 'Green triangle':'Triángulo verde',
+  'Blue star':'Estrella azul', 'Red star':'Estrella roja',
+  'Star (green/yellow)':'Estrella (verde/amarillo)', 'TL outer':'SI exterior',
+  'TR outer':'SD exterior', 'BL outer':'II exterior', 'BR outer':'ID exterior',
+  'TL inner':'SI interior', 'TR inner':'SD interior', 'BL inner':'II interior',
+  'BR inner':'ID interior', 'Red':'Rojo', 'Green':'Verde', 'Green rim':'Borde verde',
+  'Black':'Negro', 'Left bars':'Barras izquierdas', 'Right bars':'Barras derechas',
+  'Red comma':'Coma roja',
+
+  // ── Verdicts ──
+  'PERFECT':'PERFECTO', 'FLAWLESS':'IMPECABLE', 'ACE PILOT':'AS DEL AIRE', 'TOP GUN':'ÉLITE',
+  'CLEARED':'APROBADO', 'STEADY':'ESTABLE', 'NOT BAD':'NADA MAL', 'WOBBLY':'TEMBLOROSO',
+  'SHAKY':'INSEGURO', 'GROUNDED':'EN TIERRA', 'ROUGH':'TOSCO', 'CRASH':'ACCIDENTE',
+  'MAYDAY':'MAYDAY', 'IS THAT EVEN IT?':'¿ESO QUÉ ES?',
+
+  // ── Misc runtime ──
+  'trace, then score':'traza, luego puntúa',
+  'trace at least one part first':'traza al menos una parte primero',
+  'Trace the shape':'Traza la figura',
+  'Wipe all personal bests?':'¿Borrar todas las mejores marcas?',
+
+  // ── Facts ──
+  'The WWI US roundel — red rim, blue, white center. Used before the star-and-bars era.':
+    'El roundel estadounidense de la I G.M.: borde rojo, azul y centro blanco. Anterior a la era de la estrella y barras.',
+  'The <strong>original</strong> roundel — France, 1912. Unchanged to this day.':
+    'El roundel <strong>original</strong>: Francia, 1912. Sin cambios hasta hoy.',
+  'Britain flipped France\u2019s colors — red center, blue rim. Still flown today.':
+    'Gran Bretaña invirtió los colores franceses: centro rojo, borde azul. Aún en uso.',
+  'Belgium\u2019s WWI roundel — red, yellow, black, the national colors.':
+    'El roundel belga de la I G.M.: rojo, amarillo y negro, los colores nacionales.',
+  'Italy\u2019s WWI roundel — red, white, green: the tricolor as concentric rings.':
+    'El roundel italiano de la I G.M.: rojo, blanco y verde, la tricolor en anillos concéntricos.',
+  'Imperial Russia\u2019s WWI roundel — thin red and blue rings around a large white center.':
+    'El roundel de la Rusia imperial: finos anillos rojo y azul en torno a un gran centro blanco.',
+  'The German <strong>Iron Cross</strong> — a dark cross with a thin white border.':
+    'La <strong>Cruz de Hierro</strong> alemana: una cruz oscura con un fino borde blanco.',
+  'The Ottoman Empire marked aircraft with a simple black square.':
+    'El Imperio otomano marcaba sus aviones con un simple cuadrado negro.',
+  'Austria-Hungary used a single dark iron cross, like Germany\u2019s but without the white border.':
+    'Austria-Hungría usó una sola cruz de hierro oscura, como la alemana pero sin el borde blanco.',
+  'The modern US <strong>star-and-bars</strong>: white star on blue, a white bar each side with a red stripe, all edged in blue.':
+    'La moderna <strong>estrella y barras</strong> de EE. UU.: estrella blanca sobre azul, una barra blanca a cada lado con franja roja, todo ribeteado en azul.',
+  'The <strong>Hinomaru</strong> — a red disc with a thin white ring around it.':
+    'El <strong>Hinomaru</strong>: un disco rojo rodeado por un fino anillo blanco.',
+  'Mexico nests a green triangle inside white inside red — all pointing down, the flag\u2019s colors.':
+    'México anida un triángulo verde dentro de uno blanco dentro de uno rojo, todos apuntando hacia abajo: los colores de la bandera.',
+  'Modern Russia\u2019s <strong>red star</strong>: red core with white and blue borders.':
+    'La <strong>estrella roja</strong> de la Rusia moderna: núcleo rojo con bordes blanco y azul.',
+  'The PLA Air Force marking: a yellow-edged <strong>red star</strong> bearing the characters "eight-one" (for 1 August 1927, the PLA\'s founding date), flanked by two tapering bars.':
+    'La insignia de la Fuerza Aérea del EPL: una <strong>estrella roja</strong> con borde amarillo que lleva los caracteres "ocho-uno" (por el 1 de agosto de 1927, fecha de fundación del EPL), flanqueada por dos barras que se estrechan.',
+  'Brazil\u2019s roundel: a blue disc and white ring sit on a five-point star whose points are each half yellow, half green.':
+    'El roundel de Brasil: un disco azul y un anillo blanco sobre una estrella de cinco puntas, cada punta mitad amarilla y mitad verde.',
+  'Poland\u2019s <strong>szachownica</strong> — a checkerboard where each square is bordered by the opposite color.':
+    'La <strong>szachownica</strong> polaca: un damero donde cada cuadrado lleva el borde del color contrario.',
+  'Seychelles fans five flag colors from the lower-left corner — blue, yellow, red, white, green.':
+    'Seychelles despliega en abanico cinco colores desde la esquina inferior izquierda: azul, amarillo, rojo, blanco y verde.',
+  'Zimbabwe rings green, yellow, red and black around a white center — the flag\u2019s colors.':
+    'Zimbabue rodea un centro blanco con anillos verde, amarillo, rojo y negro: los colores de la bandera.',
+  'South Korea\u2019s <strong>taegeuk</strong> — red over blue, flanked by three black bars each side.':
+    'El <strong>taeguk</strong> surcoreano: rojo sobre azul, flanqueado por tres barras negras a cada lado.'
+};
+
+function t(s) {
+  if (LANG === 'en' || s == null) return s;
+  return ES[s] !== undefined ? ES[s] : s;
+}
+
+// Apply translations to all statically-tagged elements.
+function applyStaticI18n() {
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const k = el.dataset.i18n;
+    if (!el.dataset.i18nEn) el.dataset.i18nEn = el.textContent;
+    el.textContent = (LANG === 'es' && UI_ES[k]) ? UI_ES[k] : el.dataset.i18nEn;
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(el => {
+    const k = el.dataset.i18nHtml;
+    if (!el.dataset.i18nEn) el.dataset.i18nEn = el.innerHTML;
+    el.innerHTML = (LANG === 'es' && UI_ES[k]) ? UI_ES[k] : el.dataset.i18nEn;
+  });
+  document.documentElement.lang = LANG;
+}
+
+// Re-render everything that contains translated runtime strings.
+function refreshLangUI() {
+  applyStaticI18n();
+  renderRoundelButtons();
+  renderRecords();
+  updateRingTracker();
+  updateRingLabel();
+  const d = def();
+  document.getElementById('modeLabel').textContent = t(d.name);
+  document.getElementById('factBox').innerHTML = t(d.fact);
+  const hint = document.getElementById('canvasHint');
+  hint.textContent = d.parts.length === 1
+    ? t('Trace the shape')
+    : (LANG === 'es'
+        ? `Traza cada parte en orden — ${d.parts.length} en total`
+        : `Trace each part in order — ${d.parts.length} total`);
+  // Verdict line: re-render whichever state we're in.
+  const vd = document.getElementById('scoreVerdict');
+  if (state.lastScore == null) {
+    vd.textContent = t('trace, then score');
+  } else {
+    const v = verdictFor(state.lastScore);
+    vd.textContent = t(v.text).toLowerCase();
+  }
+}
+
+async function setLang(lang) {
+  LANG = lang;
+  document.querySelectorAll('.lang-btn').forEach(b =>
+    b.classList.toggle('active', b.dataset.lang === lang));
+  refreshLangUI();
+  try { await window.storage.set('shapeshifter-lang', lang); } catch(_) {}
+}
+
 // ============================================================
 // STATE
 // ============================================================
@@ -1033,7 +1231,7 @@ function updateRingTracker() {
     const done = i < state.parts.length;
     const current = i === state.parts.length;
     chip.className = 'ring-chip' + (done ? ' done' : '') + (current ? ' current' : '');
-    chip.innerHTML = `<span class="swatch" style="background:${part.color}"></span>${part.label}`;
+    chip.innerHTML = `<span class="swatch" style="background:${part.color}"></span>${t(part.label)}`;
     tracker.appendChild(chip);
   });
 }
@@ -1148,10 +1346,10 @@ function showScore(score) {
   }
   requestAnimationFrame(tick);
   const v = verdictFor(score);
-  vd.textContent = v.text.toLowerCase(); vd.style.color = v.color;
+  vd.textContent = t(v.text).toLowerCase(); vd.style.color = v.color;
   const overlay = document.getElementById('verdictOverlay');
   const text = document.getElementById('verdictText');
-  text.textContent = v.text; text.style.color = v.color;
+  text.textContent = t(v.text); text.style.color = v.color;
   overlay.classList.remove('show'); void overlay.offsetWidth; overlay.classList.add('show');
   setTimeout(() => overlay.classList.remove('show'), 1500);
   fireFx(score, v.color);
@@ -1219,16 +1417,16 @@ async function resetRecords() {
 function renderRecords(flashKey) {
   const list = document.getElementById('recordsList');
   list.innerHTML = '';
-  for (const [era, label] of [['wwi','WWI'], ['modern','Modern']]) {
+  for (const [era, label] of [['wwi','wwi'], ['modern','modern']]) {
     const hdr = document.createElement('div');
     hdr.className = 'records-era';
-    hdr.textContent = label;
+    hdr.textContent = (LANG === 'es' && UI_ES[label]) ? UI_ES[label] : (label === 'wwi' ? 'WWI' : 'Modern');
     list.appendChild(hdr);
     for (const key of sortedKeys(era)) {
       const d = ROUNDELS[key]; const rec = state.records[key];
       const row = document.createElement('div');
       row.className = 'record' + (rec ? ' has-score' : '') + (key === flashKey ? ' just-updated' : '');
-      row.innerHTML = `<span class="record-name">${d.name}</span>
+      row.innerHTML = `<span class="record-name">${t(d.name)}</span>
         <span class="record-score">${rec ? rec.score + '%' : '—'}</span>`;
       list.appendChild(row);
     }
@@ -1295,7 +1493,7 @@ function renderRoundelButtons() {
     const d = ROUNDELS[key];
     const btn = document.createElement('button');
     btn.className = 'roundel-btn' + (key === state.key ? ' active' : '');
-    btn.innerHTML = `${roundelSVG(d)}<span>${d.name}</span><span class="diff">${d.diff}</span>`;
+    btn.innerHTML = `${roundelSVG(d)}<span>${t(d.name)}</span><span class="diff">${t(d.diff)}</span>`;
     btn.onclick = () => selectRoundel(key);
     c.appendChild(btn);
   }
@@ -1310,15 +1508,17 @@ function selectEra(era) {
 function selectRoundel(key) {
   state.key = key; state.parts = []; state.currentPart = []; state.lastScore = null; state.scored = false;
   const d = def();
-  document.getElementById('modeLabel').textContent = d.name;
+  document.getElementById('modeLabel').textContent = t(d.name);
   document.getElementById('canvasHint').style.display = '';
   document.getElementById('canvasHint').textContent =
-    d.parts.length === 1 ? 'Trace the shape' : `Trace each part in order — ${d.parts.length} total`;
+    d.parts.length === 1 ? t('Trace the shape')
+      : (LANG === 'es' ? `Traza cada parte en orden — ${d.parts.length} en total`
+                       : `Trace each part in order — ${d.parts.length} total`);
   document.getElementById('scoreValue').textContent = '--';
   document.getElementById('scoreValue').classList.add('idle');
-  document.getElementById('scoreVerdict').textContent = 'trace, then score';
+  document.getElementById('scoreVerdict').textContent = t('trace, then score');
   document.getElementById('scoreVerdict').style.color = 'var(--ink)';
-  document.getElementById('factBox').innerHTML = d.fact;
+  document.getElementById('factBox').innerHTML = t(d.fact);
   fCtx.clearRect(0,0,state.canvasW,state.canvasH);
   renderRoundelButtons(); updateRingLabel(); sizeCanvases();
 }
@@ -1342,13 +1542,13 @@ document.getElementById('clearBtn').addEventListener('click', () => {
 document.getElementById('scoreBtn').addEventListener('click', () => {
   if (state.parts.length === 0) {
     const vd = document.getElementById('scoreVerdict');
-    vd.textContent = 'trace at least one part first'; vd.style.color = 'var(--ink-dim)';
+    vd.textContent = t('trace at least one part first'); vd.style.color = 'var(--ink-dim)';
     return;
   }
   showScore(computeScore());
 });
 document.getElementById('resetBtn').addEventListener('click', async () => {
-  if (confirm('Wipe all personal bests?')) await resetRecords();
+  if (confirm(t('Wipe all personal bests?'))) await resetRecords();
 });
 document.querySelectorAll('.era-tab').forEach(tab => {
   tab.addEventListener('click', () => selectEra(tab.dataset.era));
@@ -1361,6 +1561,17 @@ window.addEventListener('resize', sizeCanvases);
 renderRoundelButtons();
 selectRoundel('france');
 loadRecords();
+
+// ── Language toggle ──────────────────────────────────────────────────────
+document.querySelectorAll('.lang-btn').forEach(b =>
+  b.addEventListener('click', () => setLang(b.dataset.lang)));
+(async () => {
+  let saved = null;
+  try { const r = await window.storage.get('shapeshifter-lang'); saved = r && r.value; } catch(_) {}
+  // Fall back to the browser's language when nothing is saved yet.
+  if (!saved && (navigator.language || '').toLowerCase().startsWith('es')) saved = 'es';
+  if (saved === 'es') setLang('es'); else applyStaticI18n();
+})();
 
 // ── Instruction overlay ──────────────────────────────────────────────────
 (async () => {
